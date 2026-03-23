@@ -54,10 +54,12 @@ export default function Generate() {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
-                    idea: `${idea}\n\nAdditional Context: ${context}`,
+                    idea,
                     targetAudience,
-                    features
+                    features,
+                    context
                 })
+
             });
 
             if (!res.ok) {

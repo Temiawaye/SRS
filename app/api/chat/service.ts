@@ -28,7 +28,8 @@ export class AIAgentsService {
      * Calls the Groq API utilizing the llama-3.3-70b-versatile model to generate an SRS
      * and structured feedback in a single prompt.
      */
-    static async generateSRS(idea: string, targetAudience: string, features: string): Promise<GenerateResponse> {
+    static async generateSRS(idea: string, targetAudience: string, features: string, context?: string): Promise<GenerateResponse> {
+
         const apiKey = process.env.GROQ_API_KEY;
 
         if (!apiKey) {
@@ -62,7 +63,8 @@ You MUST respond in pure JSON format matching this exact structure, with no extr
         const userPrompt = `Please generate an SRS for the following project:
 Project Idea: ${idea}
 Target Audience: ${targetAudience || 'General Audience'}
-Key Features: ${features || 'Standard Features'}`;
+Key Features: ${features || 'Standard Features'}
+Additional Context: ${context || 'No additional context provided'}`;
 
         try {
             const response = await fetch("https://api.groq.com/openai/v1/chat/completions", {

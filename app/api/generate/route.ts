@@ -4,14 +4,15 @@ import { AIAgentsService } from '../chat/service';
 export async function POST(request: Request) {
     try {
         const body = await request.json();
-        const { idea, targetAudience, features } = body;
+        const { idea, targetAudience, features, context } = body;
 
         if (!idea) {
             return NextResponse.json({ error: 'Project idea is required' }, { status: 400 });
         }
 
         // Call the Groq-powered generation service
-        const result = await AIAgentsService.generateSRS(idea, targetAudience, features);
+        const result = await AIAgentsService.generateSRS(idea, targetAudience, features, context);
+
 
         return NextResponse.json(result);
 

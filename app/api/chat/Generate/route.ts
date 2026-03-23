@@ -4,7 +4,7 @@ import { AIAgentsService } from "../service";
 export async function POST(req: Request) {
     try {
         const body = await req.json();
-        const { idea, targetAudience, features } = body;
+        const { idea, targetAudience, features, context } = body;
 
         if (!idea) {
             return NextResponse.json(
@@ -16,8 +16,10 @@ export async function POST(req: Request) {
         const result = await AIAgentsService.generateSRS(
             idea,
             targetAudience || "",
-            features || ""
+            features || "",
+            context || ""
         );
+
 
         return NextResponse.json(result, { status: 200 });
 
