@@ -344,7 +344,7 @@ function EvaluateContent() {
 
                                             <div>
                                                 <div className="flex justify-between items-center mb-2">
-                                                    <span className="text-sm font-semibold text-slate-700">Unambiguity</span>
+                                                    <span className="text-sm font-semibold text-slate-700">Ambiguity</span>
                                                     <span className="text-xs font-bold text-slate-400">{unambiguity}%</span>
                                                 </div>
                                                 <div className="w-full bg-slate-100 rounded-full h-2">
@@ -461,7 +461,7 @@ function EvaluateContent() {
                                                                 <span className="p-1.5 bg-orange-50 text-orange-600 rounded-md group-hover:bg-orange-100 transition-colors">
                                                                     <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
                                                                 </span>
-                                                                <h3 className="font-bold text-slate-700 text-sm">Unambiguity</h3>
+                                                                <h3 className="font-bold text-slate-700 text-sm">Ambiguity</h3>
                                                             </div>
                                                             <span className="text-xs font-bold text-orange-600 bg-orange-50 px-2 py-1 rounded-md">{unambiguity}%</span>
                                                         </div>
@@ -480,7 +480,7 @@ function EvaluateContent() {
                                                             <span className="text-xs font-bold text-emerald-600 bg-emerald-50 px-2 py-1 rounded-md">{traceability}%</span>
                                                         </div>
                                                         <div className="w-full bg-slate-100 rounded-full h-1.5 mb-5"><div className="bg-emerald-500 h-1.5 rounded-full" style={{ width: `${traceability}%` }}></div></div>
-                                                        <p className="text-xs text-slate-500 font-medium mt-auto">Requirements can be traced to stakeholder needs.</p>
+                                                        <p className="text-xs text-slate-500 font-medium mt-auto">Requirements are testable and measurable.</p>
                                                     </div>
                                                 </div>
                                             </div>

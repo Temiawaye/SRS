@@ -98,6 +98,22 @@ Additional Context: ${context || 'No additional context provided'}`;
             }
 
             const parsedContent = JSON.parse(messageContent) as GenerateResponse;
+
+            // 🔹 Apply Deterministic & AI Evaluators
+            const text = parsedContent.content;
+            parsedContent.metrics.completeness = Math.round(this.checkCompleteness(text) * 100);
+            parsedContent.metrics.consistency = Math.round(this.checkAtomicity(text) * 100);
+            parsedContent.metrics.unambiguity = Math.round(this.checkAmbiguity(text) * 100);
+            parsedContent.metrics.traceability = Math.round(await this.checkVerifiability(text) * 100);
+
+            // Recalculate Overall Score (Weighted)
+            parsedContent.metrics.overall = Math.round(
+                (parsedContent.metrics.completeness * 0.2) +
+                (parsedContent.metrics.consistency * 0.2) +
+                (parsedContent.metrics.unambiguity * 0.2) +
+                (parsedContent.metrics.traceability * 0.4)
+            );
+
             return parsedContent;
 
         } catch (error) {
@@ -177,7 +193,23 @@ You MUST respond in pure JSON format matching this exact structure, with no extr
                 throw new Error("No content returned from Groq.");
             }
 
-            return JSON.parse(messageContent) as EvaluateResponse;
+            const result = JSON.parse(messageContent) as EvaluateResponse;
+
+            // 🔹 Apply Deterministic & AI Evaluators
+            result.metrics.completeness = Math.round(this.checkCompleteness(documentContent) * 100);
+            result.metrics.consistency = Math.round(this.checkAtomicity(documentContent) * 100);
+            result.metrics.unambiguity = Math.round(this.checkAmbiguity(documentContent) * 100);
+            result.metrics.traceability = Math.round(await this.checkVerifiability(documentContent) * 100);
+
+            // Recalculate Overall Score (Weighted)
+            result.metrics.overall = Math.round(
+                (result.metrics.completeness * 0.2) +
+                (result.metrics.consistency * 0.2) +
+                (result.metrics.unambiguity * 0.2) +
+                (result.metrics.traceability * 0.4)
+            );
+
+            return result;
 
         } catch (error) {
             console.error("Error evaluating SRS via Groq:", error);
@@ -187,5 +219,82 @@ You MUST respond in pure JSON format matching this exact structure, with no extr
                 issues: []
             };
         }
+    }
+
+    // 🔹 Evaluation Helper Methods
+    // -----------------------------
+
+    private static checkAmbiguity(text: string): number {
+        const ambiguousWords = ["fast", "efficient", "user-friendly", "etc", "appropriate"];
+        let count = 0;
+
+        ambiguousWords.forEach(word => {
+            const regex = new RegExp(`\\b${word}\\b`, "gi");
+            const matches = text.match(regex);
+            if (matches) count += matches.length;
+        });
+
+        const words = text.split(/\s+/).filter(w => w.length > 0);
+        const totalWords = words.length || 1;
+        return Math.max(0, 1 - count / totalWords);
+    }
+
+    private static checkAtomicity(text: string): number {
+        const sentences = text.split(/[.!?]+/).filter(s => s.trim().length > 0);
+        if (sentences.length === 0) return 1;
+
+        let multi = 0;
+        sentences.forEach(s => {
+            if (s.toLowerCase().includes(" and ") || s.toLowerCase().includes(" or ")) {
+                multi++;
+            }
+        });
+
+        return 1 - multi / sentences.length;
+    }
+
+    private static async checkVerifiability(text: string): Promise<number> {
+        const apiKey = process.env.GROQ_API_KEY;
+        if (!apiKey) return 0.5;
+
+        try {
+            const response = await fetch("https://api.groq.com/openai/v1/chat/completions", {
+                method: "POST",
+                headers: {
+                    "Authorization": `Bearer ${apiKey}`,
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({
+                    model: "llama-3.3-70b-versatile",
+                    messages: [
+                        {
+                            role: "system",
+                            content: "Classify if each requirement is testable. Return percentage score only (e.g. 0.85). Do not include any other text."
+                        },
+                        { role: "user", content: text }
+                    ],
+                    temperature: 0.1
+                })
+            });
+
+            if (!response.ok) return 0.5;
+            const data = await response.json();
+            const content = data.choices[0]?.message?.content;
+            return parseFloat(content) || 0.5;
+        } catch (error) {
+            console.error("Error checking verifiability:", error);
+            return 0.5;
+        }
+    }
+
+    private static checkCompleteness(text: string): number {
+        const sections = ["functional", "non-functional", "constraints", "assumptions"];
+        let present = 0;
+
+        sections.forEach(sec => {
+            if (text.toLowerCase().includes(sec)) present++;
+        });
+
+        return present / sections.length;
     }
 }
