@@ -19,10 +19,10 @@ export default function SrsDocument({
     title = 'Untitled Project',
     documentType = 'Software Requirements Specification (SRS)',
     version = '1.0',
-    status = 'Draft — AI Generated',
+    status = 'Draft',
     date = new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' }),
-    targetAudience = 'General',
-    preparedBy = 'AI Agents (Planner · Generator · Validator)',
+    targetAudience = 'Stakeholders',
+    preparedBy = '',
     standard = 'IEEE Std 830-1998'
 }: SrsDocumentProps) {
     if (!content) return null;
@@ -31,7 +31,7 @@ export default function SrsDocument({
         <div className="bg-white text-slate-900 font-sans max-w-[900px] mx-auto shadow-2xl overflow-hidden min-h-[1100px] flex flex-col border border-slate-200">
             {/* Header */}
             <header className="px-12 py-8 flex justify-between items-center text-[11px] font-bold tracking-[0.2em] text-slate-400 uppercase border-b border-slate-50">
-                <span>AI-SRS STUDIO</span>
+                <span>SRS STUDIO</span>
                 <span className="text-blue-500/80">CONFIDENTIAL DRAFT</span>
             </header>
 

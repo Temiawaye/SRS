@@ -1,27 +1,20 @@
 "use client";
 import Link from "next/link";
 import { useState } from "react";
-import { useAuth } from "../components/AuthProvider";
-import { supabase } from "../utils/supabaseClient";
-import Sidebar from "../components/Sidebar";
-import SrsDocument from "../components/SrsDocument";
-
-const PARADIGMS = [
-    { id: 'SRS', label: 'Software Requirements Specification (SRS)' },
-    { id: 'PRD', label: 'Product Requirements Document (PRD)' },
-    { id: 'User Stories', label: 'User Stories' }
-];
+import { useAuth } from "@/app/components/AuthProvider";
+import { supabase } from "@/app/utils/supabaseClient";
+import Sidebar from "@/app/components/Sidebar";
+import SrsDocument from "@/app/components/SrsDocument";
 
 export default function Generate() {
     const { user } = useAuth();
-    const [isDropdownOpen, setIsDropdownOpen] = useState(false);
-    const [selectedParadigm, setSelectedParadigm] = useState(PARADIGMS[0]);
     const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
     // Form inputs
     const [idea, setIdea] = useState("");
     const [targetAudience, setTargetAudience] = useState("");
     const [features, setFeatures] = useState("");
+    const [techStack, setTechStack] = useState("");
     const [context, setContext] = useState("");
 
     // Generation states
@@ -57,6 +50,7 @@ export default function Generate() {
                     idea,
                     targetAudience,
                     features,
+                    techStack,
                     context
                 })
 
@@ -193,60 +187,7 @@ export default function Generate() {
                                     </div>
                                 )}
 
-                                {/* Document Type Custom Dropdown */}
-                                <div className="relative z-30 min-w-0 w-full">
-                                    <label className="block text-xs sm:text-sm font-semibold text-slate-700 mb-2">Document Paradigm</label>
-                                    <div className="relative min-w-0 w-full">
-                                        <button
-                                            type="button"
-                                            onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-                                            className={`w-full text-left bg-slate-50/50 border rounded-xl px-4 py-3 sm:py-3.5 pr-10 text-sm md:text-base font-medium transition-all outline-none truncate flex items-center ${isDropdownOpen ? 'border-blue-500 ring-4 ring-blue-500/10 bg-slate-50' : 'border-slate-200 text-slate-700 hover:bg-slate-50'}`}
-                                        >
-                                            {selectedParadigm.label}
-                                        </button>
-                                        <div className="absolute inset-y-0 right-0 flex items-center px-4 pointer-events-none text-slate-400">
-                                            <svg className={`w-5 h-5 transition-transform duration-300 ${isDropdownOpen ? 'rotate-180 text-blue-500' : ''}`} fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                                            </svg>
-                                        </div>
-
-                                        {isDropdownOpen && (
-                                            <>
-                                                {/* Invisible overlay to catch outside clicks */}
-                                                <div className="fixed inset-0 z-40" onClick={() => setIsDropdownOpen(false)}></div>
-
-                                                {/* Dropdown Menu */}
-                                                <div className="absolute top-full left-0 right-0 mt-2 bg-white border border-slate-100 rounded-xl shadow-[0_10px_40px_-10px_rgba(0,0,0,0.15)] z-50 overflow-hidden transform origin-top">
-                                                    <div className="p-1.5 flex flex-col gap-0.5">
-                                                        {PARADIGMS.map((paradigm) => (
-                                                            <button
-                                                                key={paradigm.id}
-                                                                type="button"
-                                                                onClick={() => {
-                                                                    setSelectedParadigm(paradigm);
-                                                                    setIsDropdownOpen(false);
-                                                                }}
-                                                                className={`text-left px-3 py-3 rounded-lg text-sm md:text-base transition-colors flex items-center gap-2 group ${selectedParadigm.id === paradigm.id
-                                                                    ? 'bg-blue-50 text-blue-700 font-semibold'
-                                                                    : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900 font-medium'
-                                                                    }`}
-                                                            >
-                                                                <div className="w-5 flex items-center justify-center shrink-0">
-                                                                    {selectedParadigm.id === paradigm.id && (
-                                                                        <svg className="w-4 h-4 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" />
-                                                                        </svg>
-                                                                    )}
-                                                                </div>
-                                                                <span className="truncate">{paradigm.label}</span>
-                                                            </button>
-                                                        ))}
-                                                    </div>
-                                                </div>
-                                            </>
-                                        )}
-                                    </div>
-                                </div>
+                                {/* Document Type Removed – no longer needed */}
 
                                 {/* Project Description */}
                                 <div className="relative z-10 min-w-0 w-full mt-2">
@@ -282,6 +223,18 @@ export default function Generate() {
                                             className="w-full bg-slate-50/50 border border-slate-200 rounded-xl px-4 py-3 sm:py-3.5 text-slate-700 text-sm md:text-base placeholder:text-slate-400 focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 hover:bg-slate-50 transition-all outline-none truncate"
                                         />
                                     </div>
+                                </div>
+
+                                {/* Tech Stack */}
+                                <div className="relative z-10 min-w-0 w-full">
+                                    <label className="block text-xs sm:text-sm font-semibold text-slate-700 mb-2">Tech Stack</label>
+                                    <input
+                                        type="text"
+                                        value={techStack}
+                                        onChange={(e) => setTechStack(e.target.value)}
+                                        placeholder="e.g. Next.js, PostgreSQL, TypeScript, AWS"
+                                        className="w-full bg-slate-50/50 border border-slate-200 rounded-xl px-4 py-3 sm:py-3.5 text-slate-700 text-sm md:text-base placeholder:text-slate-400 focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 hover:bg-slate-50 transition-all outline-none"
+                                    />
                                 </div>
 
                                 {/* Additional Information */}
@@ -371,7 +324,7 @@ export default function Generate() {
                                                 <SrsDocument
                                                     content={srsData?.content}
                                                     title={idea.split(' ').slice(0, 6).join(' ')}
-                                                    documentType={selectedParadigm.label}
+                                                    documentType="Software Requirements Specification (SRS)"
                                                     targetAudience={targetAudience || 'General'}
                                                 />
                                             </div>

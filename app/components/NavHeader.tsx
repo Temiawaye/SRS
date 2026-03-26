@@ -16,7 +16,7 @@ export default function NavHeader() {
                         </svg>
                     </div>
                     <p className="text-lg md:text-xl font-bold bg-gradient-to-r from-slate-900 to-slate-700 bg-clip-text text-transparent tracking-tight">
-                        PRD Studio
+                        SRS Studio
                     </p>
                 </Link>
             </div>

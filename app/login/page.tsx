@@ -1,112 +1,148 @@
 "use client";
-import { useState } from 'react';
-import { supabase } from '../utils/supabaseClient';
-import { useRouter } from 'next/navigation';
 
-export default function Login() {
-    const [isLogin, setIsLogin] = useState(true);
+import { useState } from 'react';
+import { supabase } from '@/app/utils/supabaseClient';
+import { useRouter } from 'next/navigation';
+import Link from 'next/link';
+
+export default function LoginPage() {
+    const router = useRouter();
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
+    const [isLogin, setIsLogin] = useState(true);
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
-    const router = useRouter();
+    const [message, setMessage] = useState<string | null>(null);
 
     const handleAuth = async (e: React.FormEvent) => {
         e.preventDefault();
         setIsLoading(true);
         setError(null);
+        setMessage(null);
 
         try {
-            let error;
             if (isLogin) {
-                const { error: signInError } = await supabase.auth.signInWithPassword({ email, password });
-                error = signInError;
+                const { error } = await supabase.auth.signInWithPassword({
+                    email,
+                    password,
+                });
+                if (error) throw error;
+                router.push('/');
+                router.refresh();
             } else {
-                const { error: signUpError } = await supabase.auth.signUp({ email, password });
-                error = signUpError;
-                if (!error) {
-                    setIsLogin(true);
-                    setError("Account created successfully. You can now sign in.");
-                    setIsLoading(false);
-                    return;
-                }
-            }
-
-            if (error) {
-                setError(error.message);
-            } else {
-                router.push("/Generate");
+                const { error } = await supabase.auth.signUp({
+                    email,
+                    password,
+                    options: {
+                        emailRedirectTo: `${window.location.origin}/auth/callback`,
+                    },
+                });
+                if (error) throw error;
+                setMessage('Check your email for the confirmation link!');
             }
         } catch (err: any) {
-            setError(err.message || "An error occurred during authentication.");
+            setError(err.message || 'An error occurred during authentication');
         } finally {
             setIsLoading(false);
         }
     };
 
     return (
-        <main className="flex min-h-screen bg-slate-50 text-slate-800 font-sans items-center justify-center p-4 md:p-8">
-            <div className="w-full max-w-md bg-white p-8 md:p-10 rounded-2xl shadow-sm border border-slate-200/60 flex flex-col items-center relative overflow-hidden">
-                <div className="absolute top-0 right-0 -mt-20 -mr-20 w-48 h-48 bg-blue-500/5 rounded-full blur-3xl pointer-events-none"></div>
-
-                <div className="w-12 h-12 rounded-xl bg-gradient-to-tr from-blue-600 to-indigo-600 flex items-center justify-center shadow-lg shadow-blue-500/30 mb-6">
-                    <svg className="w-6 h-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M13 10V3L4 14h7v7l9-11h-7z" />
-                    </svg>
+        <div className="min-h-[calc(100vh-80px)] bg-slate-50 flex items-center justify-center p-4">
+            <div className="max-w-md w-full">
+                {/* Logo / Brand */}
+                <div className="text-center mb-10">
+                    <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-gradient-to-tr from-blue-600 to-indigo-600 shadow-xl shadow-blue-500/20 mb-6">
+                        <svg className="w-8 h-8 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M13 10V3L4 14h7v7l9-11h-7z" />
+                        </svg>
+                    </div>
+                    <h1 className="text-3xl font-bold text-slate-900 tracking-tight">
+                        {isLogin ? 'Welcome Back' : 'Create Account'}
+                    </h1>
+                    <p className="text-slate-500 mt-2 font-medium">
+                        {isLogin ? 'Sign in to access your projects' : 'Start generating professional SRS documents'}
+                    </p>
                 </div>
 
-                <h1 className="text-2xl font-bold text-slate-900 tracking-tight mb-2">Welcome to PRD Studio</h1>
-                <p className="text-slate-500 text-sm mb-8 text-center">Sign in to orchestrate AI agents and manage your Software Requirements Specifications.</p>
+                {/* Auth Card */}
+                <div className="bg-white rounded-[2rem] shadow-xl shadow-slate-200/50 border border-slate-100 p-8 md:p-10 relative overflow-hidden">
+                    {/* Decorative Elements */}
+                    <div className="absolute top-0 right-0 w-32 h-32 bg-blue-500/5 rounded-full blur-3xl -mt-16 -mr-16 pointer-events-none"></div>
+                    <div className="absolute bottom-0 left-0 w-24 h-24 bg-indigo-500/5 rounded-full blur-2xl -mb-12 -ml-12 pointer-events-none"></div>
 
-                {error && (
-                    <div className={`w-full p-3 mb-6 rounded-xl text-sm font-medium ${error.includes('successfully') ? 'bg-emerald-50 text-emerald-600 border border-emerald-100' : 'bg-red-50 text-red-600 border border-red-100'}`}>
-                        {error}
+                    <form onSubmit={handleAuth} className="space-y-6 relative z-10">
+                        {error && (
+                            <div className="p-4 bg-red-50 border border-red-100 text-red-600 rounded-xl text-sm font-medium animate-in fade-in slide-in-from-top-1">
+                                {error}
+                            </div>
+                        )}
+                        {message && (
+                            <div className="p-4 bg-emerald-50 border border-emerald-100 text-emerald-600 rounded-xl text-sm font-medium animate-in fade-in slide-in-from-top-1">
+                                {message}
+                            </div>
+                        )}
+
+                        <div className="space-y-2">
+                            <label className="text-sm font-bold text-slate-700 ml-1">Email Address</label>
+                            <input
+                                type="email"
+                                required
+                                value={email}
+                                onChange={(e) => setEmail(e.target.value)}
+                                placeholder="name@company.com"
+                                className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3.5 text-slate-900 placeholder:text-slate-400 focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all outline-none"
+                            />
+                        </div>
+
+                        <div className="space-y-2">
+                            <label className="text-sm font-bold text-slate-700 ml-1">Password</label>
+                            <input
+                                type="password"
+                                required
+                                value={password}
+                                onChange={(e) => setPassword(e.target.value)}
+                                placeholder="••••••••"
+                                className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3.5 text-slate-900 placeholder:text-slate-400 focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all outline-none"
+                            />
+                        </div>
+
+                        <button
+                            type="submit"
+                            disabled={isLoading}
+                            className="w-full bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-bold py-4 rounded-xl shadow-lg shadow-blue-500/25 hover:shadow-xl hover:shadow-blue-500/40 hover:-translate-y-0.5 active:scale-[0.98] transition-all flex items-center justify-center gap-3"
+                        >
+                            {isLoading ? (
+                                <svg className="animate-spin h-5 w-5 text-white" fill="none" viewBox="0 0 24 24">
+                                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                </svg>
+                            ) : (
+                                isLogin ? 'Sign In' : 'Create Account'
+                            )}
+                        </button>
+                    </form>
+
+                    <div className="mt-8 text-center relative z-10">
+                        <button
+                            onClick={() => setIsLogin(!isLogin)}
+                            className="text-sm font-semibold text-slate-500 hover:text-blue-600 transition-colors"
+                        >
+                            {isLogin ? "Don't have an account? Sign Up" : "Already have an account? Sign In"}
+                        </button>
                     </div>
-                )}
+                </div>
 
-                <form className="w-full flex flex-col gap-4" onSubmit={handleAuth}>
-                    <div>
-                        <label className="block text-xs font-semibold text-slate-700 mb-1.5 uppercase tracking-wider">Email Address</label>
-                        <input
-                            type="email"
-                            required
-                            value={email}
-                            onChange={(e) => setEmail(e.target.value)}
-                            className="w-full bg-slate-50/50 border border-slate-200 rounded-xl px-4 py-3 text-slate-700 text-sm placeholder:text-slate-400 focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all outline-none"
-                            placeholder="you@company.com"
-                        />
-                    </div>
-                    <div>
-                        <label className="block text-xs font-semibold text-slate-700 mb-1.5 uppercase tracking-wider">Password</label>
-                        <input
-                            type="password"
-                            required
-                            value={password}
-                            onChange={(e) => setPassword(e.target.value)}
-                            className="w-full bg-slate-50/50 border border-slate-200 rounded-xl px-4 py-3 text-slate-700 text-sm placeholder:text-slate-400 focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all outline-none"
-                            placeholder="••••••••"
-                        />
-                    </div>
-
-                    <button
-                        type="submit"
-                        disabled={isLoading}
-                        className="mt-4 w-full bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-medium rounded-xl px-4 py-3.5 shadow-lg shadow-blue-500/25 hover:shadow-xl hover:shadow-blue-500/40 hover:-translate-y-0.5 transition-all duration-300 active:scale-[0.98] flex items-center justify-center gap-2 disabled:opacity-70"
-                    >
-                        {isLoading ? 'Processing...' : (isLogin ? 'Sign In required' : 'Create Account')}
-                    </button>
-                </form>
-
-                <p className="mt-8 text-sm text-slate-500">
-                    {isLogin ? "Don't have an account?" : "Already have an account?"}
-                    <button
-                        onClick={() => { setIsLogin(!isLogin); setError(null); }}
-                        className="ml-1.5 font-semibold text-blue-600 hover:text-blue-700 transition-colors"
-                    >
-                        {isLogin ? "Sign up" : "Sign in"}
-                    </button>
-                </p>
+                {/* Back Link */}
+                <div className="mt-8 text-center">
+                    <Link href="/" className="inline-flex items-center gap-2 text-sm font-bold text-slate-400 hover:text-slate-600 transition-colors">
+                        <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+                        </svg>
+                        Back to Home
+                    </Link>
+                </div>
             </div>
-        </main>
+        </div>
     );
 }

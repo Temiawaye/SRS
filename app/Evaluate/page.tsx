@@ -2,10 +2,10 @@
 import React, { useState, useEffect, Suspense } from 'react';
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
-import { supabase } from '../utils/supabaseClient';
-import { useAuth } from '../components/AuthProvider';
-import Sidebar from '../components/Sidebar';
-import SrsDocument from '../components/SrsDocument';
+import { supabase } from '@/app/utils/supabaseClient';
+import { useAuth } from '@/app/components/AuthProvider';
+import Sidebar from '@/app/components/Sidebar';
+import SrsDocument from '@/app/components/SrsDocument';
 
 function EvaluateContent() {
     const { user, isLoading: authLoading } = useAuth();
