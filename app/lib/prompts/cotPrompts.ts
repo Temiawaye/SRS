@@ -89,18 +89,54 @@ Your job is to convert that plan into a complete, professional SRS document in M
 
 Think step by step:
 1. Map each Planner functional area to a numbered SRS section.
-2. For every requirement, reference the stakeholder goal it satisfies using the pattern [TRACES: stakeholder-name].
-3. Write Non-Functional Requirements from the planner's constraints list.
-4. Add an Assumptions & Dependencies section addressing the planner's open ambiguities.
-5. Ensure requirements use precise, measurable language (avoid "fast", "user-friendly", "etc.").
+2. Specify requirements in sufficient detail to enable designers to design a system to satisfy those requirements and testers to verify requirements
+3. For every requirement, reference the stakeholder goal it satisfies using the pattern [TRACES: stakeholder-name].
+4. Requirements should include, at a minimum, a description of every input (stimulus) into the system, every output (response) from the system, and all functions performed by the system in response to an input or in support of an output
+ 4.1 Requirements should have characteristics of high quality requirements
+ 4.2 Requirements should be cross-referenced to their source.
+ 4.3 Requirements should be uniquely identifiable
+ 4.4 Requirements should be organized to maximize readability
+5. Write Non-Functional Requirements from the planner's constraints list.
+6. Add an Assumptions & Dependencies section addressing the planner's open ambiguities.
+7. Ensure requirements use precise, measurable language (avoid "fast", "user-friendly", "etc.").
 
 The SRS MUST include these sections:
-- 1. Introduction (Purpose, Scope, Definitions)
-- 2. Overall Description (System Perspective, User Classes, Constraints)
-- 3. Functional Requirements (numbered as FR-001, FR-002, …)
-- 4. Non-Functional Requirements (numbered as NFR-001, NFR-002, …)
-- 5. Assumptions & Dependencies
-- 6. Appendix (Glossary if needed)
+- 1. Introduction
+  - 1.1 Purpose
+  - 1.2 Scope
+  - 1.3 Definitions
+  - 1.4 References  
+  - 1.5. Overview
+  - 1.6. Risk Analysis
+- 2. Overall Description
+  - 2.1 System Perspective
+  - 2.2 User Classes
+  - 2.3 Operating Environment
+  - 2.4 Constraints
+  - 2.5 Assumptions & Dependencies
+- 3. Specific Requirements
+    - 3.1 Functional Requirements (numbered as FR-001, FR-002, …)
+    - 3.2 Non-Functional Requirements (numbered as NFR-001, NFR-002, …)
+    - 3.3 Data Requirements
+    - 3.4 Performance Requirements
+    - 3.5 Business Rules
+    - 3.6 Data Model
+- 4. External Interfaces
+    - 4.1 User Interface (UI)
+    - 4.2 Hardware Interfaces
+    - 4.3 Software Interfaces
+    - 4.4 Communication Interfaces
+- 5. System Features
+    - 5.1 Description
+    - 5.2 What the feature does
+    - 5.3 Inputs
+    - 5.4 User prompt 
+    - 5.5 Processing
+    - 5.6 AI generates structured requirements
+    - 5.7 Outputs
+    - 5.8 Completed SRS document
+    - 5.9 Requirements
+    - 5.10 FRs tied to this feature
 
 You MUST respond in pure JSON matching this exact structure (no markdown wrapping):
 {

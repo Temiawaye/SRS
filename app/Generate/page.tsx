@@ -1,6 +1,6 @@
 "use client";
 import Link from "next/link";
-import { useState } from "react";
+import { useState, useRef, useEffect, useCallback } from "react";
 import { useAuth } from "@/app/components/AuthProvider";
 import { supabase } from "@/app/utils/supabaseClient";
 import Sidebar from "@/app/components/Sidebar";
@@ -11,11 +11,33 @@ export default function Generate() {
     const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
     // Form inputs
+    const [projectName, setProjectName] = useState("");
     const [idea, setIdea] = useState("");
     const [targetAudience, setTargetAudience] = useState("");
     const [features, setFeatures] = useState("");
     const [techStack, setTechStack] = useState("");
     const [context, setContext] = useState("");
+
+    // Auto-resize textarea refs
+    const projectNameRef = useRef<HTMLTextAreaElement>(null);
+    const ideaRef = useRef<HTMLTextAreaElement>(null);
+    const targetAudienceRef = useRef<HTMLTextAreaElement>(null);
+    const featuresRef = useRef<HTMLTextAreaElement>(null);
+    const techStackRef = useRef<HTMLTextAreaElement>(null);
+    const contextRef = useRef<HTMLTextAreaElement>(null);
+
+    const autoResize = useCallback((el: HTMLTextAreaElement | null) => {
+        if (!el) return;
+        el.style.height = "auto";
+        el.style.height = el.scrollHeight + "px";
+    }, []);
+
+    useEffect(() => { autoResize(projectNameRef.current); }, [projectName, autoResize]);
+    useEffect(() => { autoResize(ideaRef.current); }, [idea, autoResize]);
+    useEffect(() => { autoResize(targetAudienceRef.current); }, [targetAudience, autoResize]);
+    useEffect(() => { autoResize(featuresRef.current); }, [features, autoResize]);
+    useEffect(() => { autoResize(techStackRef.current); }, [techStack, autoResize]);
+    useEffect(() => { autoResize(contextRef.current); }, [context, autoResize]);
 
     // Generation states
     const [isGenerating, setIsGenerating] = useState(false);
@@ -33,6 +55,10 @@ export default function Generate() {
     const [isSaving, setIsSaving] = useState(false);
 
     const handleGenerate = async () => {
+        if (!projectName.trim()) {
+            setError("Project Name is required.");
+            return;
+        }
         if (!idea.trim()) {
             setError("Project Outline is required.");
             return;
@@ -63,8 +89,8 @@ export default function Generate() {
 
             const data = await res.json();
 
-            // Generate a simple title from the idea
-            const projectTitle = idea.split(' ').slice(0, 5).join(' ') + '...';
+            // Use the user-provided project name as the title
+            const projectTitle = projectName.trim();
 
             // 2. Insert into Supabase (if logged in)
             if (user && data.content) {
@@ -189,52 +215,70 @@ export default function Generate() {
 
                                 {/* Document Type Removed – no longer needed */}
 
-                                {/* Project Description */}
+                                {/* Project Name */}
                                 <div className="relative z-10 min-w-0 w-full mt-2">
+                                    <label className="block text-xs sm:text-sm font-semibold text-slate-700 mb-2">Project Name</label>
+                                    <textarea
+                                        ref={projectNameRef}
+                                        value={projectName}
+                                        onChange={(e) => setProjectName(e.target.value)}
+                                        placeholder="Enter a name for your project."
+                                        rows={1}
+                                        className="w-full bg-slate-50/50 border border-slate-200 rounded-xl px-4 py-3 sm:py-3.5 text-slate-700 text-sm md:text-base placeholder:text-slate-400 focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 hover:bg-slate-50 transition-all outline-none min-h-[56px] resize-none overflow-hidden"
+                                    ></textarea>
+                                </div>
+
+                                {/* Project Outline */}
+                                <div className="relative z-10 min-w-0 w-full">
                                     <label className="block text-xs sm:text-sm font-semibold text-slate-700 mb-2">Project Outline</label>
                                     <textarea
+                                        ref={ideaRef}
                                         value={idea}
                                         onChange={(e) => setIdea(e.target.value)}
                                         placeholder="Briefly describe what your project is about."
-                                        className="w-full bg-slate-50/50 border border-slate-200 rounded-xl px-4 py-3 sm:py-3.5 text-slate-700 text-sm md:text-base placeholder:text-slate-400 focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 hover:bg-slate-50 transition-all outline-none min-h-[140px] resize-y"
+                                        rows={1}
+                                        className="w-full bg-slate-50/50 border border-slate-200 rounded-xl px-4 py-3 sm:py-3.5 text-slate-700 text-sm md:text-base placeholder:text-slate-400 focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 hover:bg-slate-50 transition-all outline-none min-h-[56px] resize-none overflow-hidden"
                                     ></textarea>
                                 </div>
 
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8 relative z-10 min-w-0 w-full">
                                     {/* Target Audience */}
                                     <div className="min-w-0 w-full">
-                                        <label className="block text-xs sm:text-sm font-semibold text-slate-700 mb-2 truncate">Target Audience</label>
-                                        <input
-                                            type="text"
+                                        <label className="block text-xs sm:text-sm font-semibold text-slate-700 mb-2">Target Audience</label>
+                                        <textarea
+                                            ref={targetAudienceRef}
                                             value={targetAudience}
                                             onChange={(e) => setTargetAudience(e.target.value)}
                                             placeholder="e.g. Students"
-                                            className="w-full bg-slate-50/50 border border-slate-200 rounded-xl px-4 py-3 sm:py-3.5 text-slate-700 text-sm md:text-base placeholder:text-slate-400 focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 hover:bg-slate-50 transition-all outline-none truncate"
-                                        />
+                                            rows={1}
+                                            className="w-full bg-slate-50/50 border border-slate-200 rounded-xl px-4 py-3 sm:py-3.5 text-slate-700 text-sm md:text-base placeholder:text-slate-400 focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 hover:bg-slate-50 transition-all outline-none min-h-[56px] resize-none overflow-hidden"
+                                        ></textarea>
                                     </div>
                                     {/* Key Features */}
                                     <div className="min-w-0 w-full">
-                                        <label className="block text-xs sm:text-sm font-semibold text-slate-700 mb-2 truncate">Key Highlights</label>
-                                        <input
-                                            type="text"
+                                        <label className="block text-xs sm:text-sm font-semibold text-slate-700 mb-2">Key Highlights</label>
+                                        <textarea
+                                            ref={featuresRef}
                                             value={features}
                                             onChange={(e) => setFeatures(e.target.value)}
                                             placeholder="e.g. Authentication"
-                                            className="w-full bg-slate-50/50 border border-slate-200 rounded-xl px-4 py-3 sm:py-3.5 text-slate-700 text-sm md:text-base placeholder:text-slate-400 focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 hover:bg-slate-50 transition-all outline-none truncate"
-                                        />
+                                            rows={1}
+                                            className="w-full bg-slate-50/50 border border-slate-200 rounded-xl px-4 py-3 sm:py-3.5 text-slate-700 text-sm md:text-base placeholder:text-slate-400 focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 hover:bg-slate-50 transition-all outline-none min-h-[56px] resize-none overflow-hidden"
+                                        ></textarea>
                                     </div>
                                 </div>
 
                                 {/* Tech Stack */}
                                 <div className="relative z-10 min-w-0 w-full">
                                     <label className="block text-xs sm:text-sm font-semibold text-slate-700 mb-2">Tech Stack</label>
-                                    <input
-                                        type="text"
+                                    <textarea
+                                        ref={techStackRef}
                                         value={techStack}
                                         onChange={(e) => setTechStack(e.target.value)}
                                         placeholder="e.g. Next.js, PostgreSQL, TypeScript, AWS"
-                                        className="w-full bg-slate-50/50 border border-slate-200 rounded-xl px-4 py-3 sm:py-3.5 text-slate-700 text-sm md:text-base placeholder:text-slate-400 focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 hover:bg-slate-50 transition-all outline-none"
-                                    />
+                                        rows={1}
+                                        className="w-full bg-slate-50/50 border border-slate-200 rounded-xl px-4 py-3 sm:py-3.5 text-slate-700 text-sm md:text-base placeholder:text-slate-400 focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 hover:bg-slate-50 transition-all outline-none min-h-[56px] resize-none overflow-hidden"
+                                    ></textarea>
                                 </div>
 
                                 {/* Additional Information */}
@@ -243,10 +287,12 @@ export default function Generate() {
                                         Additional Context <span className="text-[10px] uppercase font-bold text-slate-400 bg-slate-100 px-2 py-0.5 rounded-md hidden sm:inline-block">Optional</span>
                                     </label>
                                     <textarea
+                                        ref={contextRef}
                                         value={context}
                                         onChange={(e) => setContext(e.target.value)}
                                         placeholder="Any technical constraints?"
-                                        className="w-full bg-slate-50/50 border border-slate-200 rounded-xl px-4 py-3 sm:py-3.5 text-slate-700 text-sm md:text-base placeholder:text-slate-400 focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 hover:bg-slate-50 transition-all outline-none min-h-[100px] resize-y"
+                                        rows={1}
+                                        className="w-full bg-slate-50/50 border border-slate-200 rounded-xl px-4 py-3 sm:py-3.5 text-slate-700 text-sm md:text-base placeholder:text-slate-400 focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 hover:bg-slate-50 transition-all outline-none min-h-[56px] resize-none overflow-hidden"
                                     ></textarea>
                                 </div>
 
@@ -323,7 +369,7 @@ export default function Generate() {
                                             <div className="p-4 sm:p-6 bg-slate-50/50">
                                                 <SrsDocument
                                                     content={srsData?.content}
-                                                    title={idea.split(' ').slice(0, 6).join(' ')}
+                                                    title={projectName.trim() || idea.split(' ').slice(0, 6).join(' ')}
                                                     documentType="Software Requirements Specification (SRS)"
                                                     targetAudience={targetAudience || 'General'}
                                                 />
