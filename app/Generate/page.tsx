@@ -224,7 +224,7 @@ export default function Generate() {
                                         onChange={(e) => setProjectName(e.target.value)}
                                         placeholder="Enter a name for your project."
                                         rows={1}
-                                        className="w-full bg-slate-50/50 border border-slate-200 rounded-xl px-4 py-3 sm:py-3.5 text-slate-700 text-sm md:text-base placeholder:text-slate-400 focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 hover:bg-slate-50 transition-all outline-none min-h-[56px] resize-none overflow-hidden"
+                                        className="w-full bg-slate-50/50 border border-slate-200 rounded-xl px-4 py-3 sm:py-3.5 text-slate-700 text-sm md:text-base placeholder:text-slate-400 focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 hover:bg-slate-50 transition-all outline-none max-h-[56px] resize-none overflow-hidden"
                                     ></textarea>
                                 </div>
 
@@ -237,7 +237,7 @@ export default function Generate() {
                                         onChange={(e) => setIdea(e.target.value)}
                                         placeholder="Briefly describe what your project is about."
                                         rows={1}
-                                        className="w-full bg-slate-50/50 border border-slate-200 rounded-xl px-4 py-3 sm:py-3.5 text-slate-700 text-sm md:text-base placeholder:text-slate-400 focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 hover:bg-slate-50 transition-all outline-none min-h-[56px] resize-none overflow-hidden"
+                                        className="w-full bg-slate-50/50 border border-slate-200 rounded-xl px-4 py-3 sm:py-3.5 text-slate-700 text-sm md:text-base placeholder:text-slate-400 focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 hover:bg-slate-50 transition-all outline-none max-h-[400px] resize-none overflow-hidden"
                                     ></textarea>
                                 </div>
 
@@ -251,7 +251,7 @@ export default function Generate() {
                                             onChange={(e) => setTargetAudience(e.target.value)}
                                             placeholder="e.g. Students"
                                             rows={1}
-                                            className="w-full bg-slate-50/50 border border-slate-200 rounded-xl px-4 py-3 sm:py-3.5 text-slate-700 text-sm md:text-base placeholder:text-slate-400 focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 hover:bg-slate-50 transition-all outline-none min-h-[56px] resize-none overflow-hidden"
+                                            className="w-full bg-slate-50/50 border border-slate-200 rounded-xl px-4 py-3 sm:py-3.5 text-slate-700 text-sm md:text-base placeholder:text-slate-400 focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 hover:bg-slate-50 transition-all outline-none max-h-[270px] resize-none overflow-hidden"
                                         ></textarea>
                                     </div>
                                     {/* Key Features */}
@@ -263,7 +263,7 @@ export default function Generate() {
                                             onChange={(e) => setFeatures(e.target.value)}
                                             placeholder="e.g. Authentication"
                                             rows={1}
-                                            className="w-full bg-slate-50/50 border border-slate-200 rounded-xl px-4 py-3 sm:py-3.5 text-slate-700 text-sm md:text-base placeholder:text-slate-400 focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 hover:bg-slate-50 transition-all outline-none min-h-[56px] resize-none overflow-hidden"
+                                            className="w-full bg-slate-50/50 border border-slate-200 rounded-xl px-4 py-3 sm:py-3.5 text-slate-700 text-sm md:text-base placeholder:text-slate-400 focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 hover:bg-slate-50 transition-all outline-none max-h-[270px] resize-none overflow-hidden"
                                         ></textarea>
                                     </div>
                                 </div>
@@ -277,7 +277,7 @@ export default function Generate() {
                                         onChange={(e) => setTechStack(e.target.value)}
                                         placeholder="e.g. Next.js, PostgreSQL, TypeScript, AWS"
                                         rows={1}
-                                        className="w-full bg-slate-50/50 border border-slate-200 rounded-xl px-4 py-3 sm:py-3.5 text-slate-700 text-sm md:text-base placeholder:text-slate-400 focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 hover:bg-slate-50 transition-all outline-none min-h-[56px] resize-none overflow-hidden"
+                                        className="w-full bg-slate-50/50 border border-slate-200 rounded-xl px-4 py-3 sm:py-3.5 text-slate-700 text-sm md:text-base placeholder:text-slate-400 focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 hover:bg-slate-50 transition-all outline-none max-h-[270px] resize-none overflow-hidden"
                                     ></textarea>
                                 </div>
 
@@ -292,7 +292,7 @@ export default function Generate() {
                                         onChange={(e) => setContext(e.target.value)}
                                         placeholder="Any technical constraints?"
                                         rows={1}
-                                        className="w-full bg-slate-50/50 border border-slate-200 rounded-xl px-4 py-3 sm:py-3.5 text-slate-700 text-sm md:text-base placeholder:text-slate-400 focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 hover:bg-slate-50 transition-all outline-none min-h-[56px] resize-none overflow-hidden"
+                                        className="w-full bg-slate-50/50 border border-slate-200 rounded-xl px-4 py-3 sm:py-3.5 text-slate-700 text-sm md:text-base placeholder:text-slate-400 focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 hover:bg-slate-50 transition-all outline-none max-h-[400px] resize-none overflow-hidden"
                                     ></textarea>
                                 </div>
 
