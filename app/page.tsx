@@ -64,7 +64,7 @@ export default function Home() {
               <div className="bg-white dark:bg-slate-900 rounded-[24px] md:rounded-[32px] p-2 shadow-2xl border border-white/50 dark:border-slate-800/50 backdrop-blur-sm overflow-hidden ring-1 ring-slate-200/50 dark:ring-slate-800/50">
                 <div className="bg-slate-50 dark:bg-slate-950 rounded-[18px] md:rounded-[26px] overflow-hidden border border-slate-100 dark:border-slate-800">
                   <Image
-                    src={mounted && resolvedTheme === 'dark' ? '/hero_dark.png' : '/hero_ligh.png'}
+                    src={mounted && resolvedTheme === 'dark' ? '/hero_dark.png' : '/heroli.png'}
                     alt="PRD Studio Evaluation Preview"
                     width={1400}
                     height={800}

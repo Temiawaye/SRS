@@ -8,6 +8,7 @@ import Link from 'next/link';
 export default function LoginPage() {
     const router = useRouter();
     const [email, setEmail] = useState('');
+    const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
     const [isLogin, setIsLogin] = useState(true);
     const [isLoading, setIsLoading] = useState(false);
@@ -35,6 +36,9 @@ export default function LoginPage() {
                     password,
                     options: {
                         emailRedirectTo: `${window.location.origin}/auth/callback`,
+                        data: {
+                            username,
+                        }
                     },
                 });
                 if (error) throw error;
@@ -83,6 +87,20 @@ export default function LoginPage() {
                             </div>
                         )}
 
+                        {!isLogin && (
+                            <div className="space-y-2">
+                                <label className="text-sm font-bold text-slate-700 dark:text-slate-300 ml-1 transition-colors">Username</label>
+                                <input
+                                    type="text"
+                                    required={!isLogin}
+                                    value={username}
+                                    onChange={(e) => setUsername(e.target.value)}
+                                    placeholder="johndoe"
+                                    className="w-full bg-slate-50 dark:bg-slate-950/50 border border-slate-200 dark:border-slate-800 rounded-xl px-4 py-3.5 text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-600 focus:ring-4 focus:ring-emerald-500/10 focus:border-emerald-500 transition-all outline-none"
+                                />
+                            </div>
+                        )}
+
                         <div className="space-y-2">
                             <label className="text-sm font-bold text-slate-700 dark:text-slate-300 ml-1 transition-colors">Email Address</label>
                             <input
@@ -126,9 +144,19 @@ export default function LoginPage() {
                     <div className="mt-8 text-center relative z-10">
                         <button
                             onClick={() => setIsLogin(!isLogin)}
-                            className="text-sm font-semibold text-slate-500 dark:text-slate-400 hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors"
+                            className="inline-flex items-center gap-2 text-sm font-bold text-emerald-600 dark:text-emerald-400 hover:text-emerald-700 dark:hover:text-emerald-300 transition-all hover:scale-105"
                         >
-                            {isLogin ? "Don't have an account? Sign Up" : "Already have an account? Sign In"}
+                            {isLogin ? (
+                                <>
+                                    <span>Don't have an account? Sign Up</span>
+                                    <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" /></svg>
+                                </>
+                            ) : (
+                                <>
+                                    <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" /></svg>
+                                    <span>Already have an account? Sign In</span>
+                                </>
+                            )}
                         </button>
                     </div>
                 </div>

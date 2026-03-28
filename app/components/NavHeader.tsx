@@ -22,11 +22,13 @@ export default function NavHeader() {
                 </Link>
             </div>
             <div className="flex items-center gap-3 md:gap-6">
-                <ThemeToggle />
+                {/* <ThemeToggle /> */}
                 {!isLoading && user ? (
                     <div className="flex items-center gap-4">
-                        <div className="hidden sm:flex flex-col items-end">
-                            <span className="text-sm font-semibold text-slate-800 dark:text-slate-200">{user.email}</span>
+                        <div className="flex flex-col items-end">
+                            <span className="text-xs md:text-sm font-semibold text-slate-800 dark:text-slate-200 truncate max-w-[120px] md:max-w-[200px]">
+                                {user.user_metadata?.username || user.user_metadata?.full_name || user.email?.split('@')[0]}
+                            </span>
                         </div>
                         <button
                             onClick={signOut}
