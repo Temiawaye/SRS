@@ -48,69 +48,69 @@ export default function LoginPage() {
     };
 
     return (
-        <div className="min-h-[calc(100vh-80px)] bg-slate-50 flex items-center justify-center p-4">
+        <div className="min-h-[calc(100vh-80px)] bg-slate-50 dark:bg-slate-950 flex items-center justify-center p-4 transition-colors duration-300">
             <div className="max-w-md w-full">
                 {/* Logo / Brand */}
                 <div className="text-center mb-10">
-                    <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-gradient-to-tr from-blue-600 to-indigo-600 shadow-xl shadow-blue-500/20 mb-6">
+                    <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-gradient-to-tr from-emerald-500 to-teal-600 shadow-xl shadow-emerald-500/20 mb-6">
                         <svg className="w-8 h-8 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M13 10V3L4 14h7v7l9-11h-7z" />
                         </svg>
                     </div>
-                    <h1 className="text-3xl font-bold text-slate-900 tracking-tight">
+                    <h1 className="text-3xl font-bold text-slate-900 dark:text-white tracking-tight transition-colors">
                         {isLogin ? 'Welcome Back' : 'Create Account'}
                     </h1>
-                    <p className="text-slate-500 mt-2 font-medium">
+                    <p className="text-slate-500 dark:text-slate-400 mt-2 font-medium transition-colors">
                         {isLogin ? 'Sign in to access your projects' : 'Start generating professional SRS documents'}
                     </p>
                 </div>
 
                 {/* Auth Card */}
-                <div className="bg-white rounded-[2rem] shadow-xl shadow-slate-200/50 border border-slate-100 p-8 md:p-10 relative overflow-hidden">
+                <div className="bg-white dark:bg-slate-900 rounded-[2rem] shadow-xl shadow-slate-200/50 dark:shadow-none border border-slate-100 dark:border-slate-800 p-8 md:p-10 relative overflow-hidden transition-all duration-300">
                     {/* Decorative Elements */}
-                    <div className="absolute top-0 right-0 w-32 h-32 bg-blue-500/5 rounded-full blur-3xl -mt-16 -mr-16 pointer-events-none"></div>
-                    <div className="absolute bottom-0 left-0 w-24 h-24 bg-indigo-500/5 rounded-full blur-2xl -mb-12 -ml-12 pointer-events-none"></div>
+                    <div className="absolute top-0 right-0 w-32 h-32 bg-emerald-500/5 rounded-full blur-3xl -mt-16 -mr-16 pointer-events-none"></div>
+                    <div className="absolute bottom-0 left-0 w-24 h-24 bg-teal-500/5 rounded-full blur-2xl -mb-12 -ml-12 pointer-events-none"></div>
 
                     <form onSubmit={handleAuth} className="space-y-6 relative z-10">
                         {error && (
-                            <div className="p-4 bg-red-50 border border-red-100 text-red-600 rounded-xl text-sm font-medium animate-in fade-in slide-in-from-top-1">
+                            <div className="p-4 bg-red-50 dark:bg-red-900/20 border border-red-100 dark:border-red-900/30 text-red-600 dark:text-red-400 rounded-xl text-sm font-medium animate-in fade-in slide-in-from-top-1">
                                 {error}
                             </div>
                         )}
                         {message && (
-                            <div className="p-4 bg-emerald-50 border border-emerald-100 text-emerald-600 rounded-xl text-sm font-medium animate-in fade-in slide-in-from-top-1">
+                            <div className="p-4 bg-emerald-50 dark:bg-emerald-900/20 border border-emerald-100 dark:border-emerald-900/30 text-emerald-600 dark:text-emerald-400 rounded-xl text-sm font-medium animate-in fade-in slide-in-from-top-1">
                                 {message}
                             </div>
                         )}
 
                         <div className="space-y-2">
-                            <label className="text-sm font-bold text-slate-700 ml-1">Email Address</label>
+                            <label className="text-sm font-bold text-slate-700 dark:text-slate-300 ml-1 transition-colors">Email Address</label>
                             <input
                                 type="email"
                                 required
                                 value={email}
                                 onChange={(e) => setEmail(e.target.value)}
                                 placeholder="name@company.com"
-                                className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3.5 text-slate-900 placeholder:text-slate-400 focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all outline-none"
+                                className="w-full bg-slate-50 dark:bg-slate-950/50 border border-slate-200 dark:border-slate-800 rounded-xl px-4 py-3.5 text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-600 focus:ring-4 focus:ring-emerald-500/10 focus:border-emerald-500 transition-all outline-none"
                             />
                         </div>
 
                         <div className="space-y-2">
-                            <label className="text-sm font-bold text-slate-700 ml-1">Password</label>
+                            <label className="text-sm font-bold text-slate-700 dark:text-slate-300 ml-1 transition-colors">Password</label>
                             <input
                                 type="password"
                                 required
                                 value={password}
                                 onChange={(e) => setPassword(e.target.value)}
                                 placeholder="••••••••"
-                                className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3.5 text-slate-900 placeholder:text-slate-400 focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all outline-none"
+                                className="w-full bg-slate-50 dark:bg-slate-950/50 border border-slate-200 dark:border-slate-800 rounded-xl px-4 py-3.5 text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-600 focus:ring-4 focus:ring-emerald-500/10 focus:border-emerald-500 transition-all outline-none"
                             />
                         </div>
 
                         <button
                             type="submit"
                             disabled={isLoading}
-                            className="w-full bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-bold py-4 rounded-xl shadow-lg shadow-blue-500/25 hover:shadow-xl hover:shadow-blue-500/40 hover:-translate-y-0.5 active:scale-[0.98] transition-all flex items-center justify-center gap-3"
+                            className="w-full bg-gradient-to-r from-emerald-500 to-teal-600 text-white font-bold py-4 rounded-xl shadow-lg shadow-emerald-500/25 hover:shadow-xl hover:shadow-emerald-500/40 hover:-translate-y-0.5 active:scale-[0.98] transition-all flex items-center justify-center gap-3"
                         >
                             {isLoading ? (
                                 <svg className="animate-spin h-5 w-5 text-white" fill="none" viewBox="0 0 24 24">
@@ -126,7 +126,7 @@ export default function LoginPage() {
                     <div className="mt-8 text-center relative z-10">
                         <button
                             onClick={() => setIsLogin(!isLogin)}
-                            className="text-sm font-semibold text-slate-500 hover:text-blue-600 transition-colors"
+                            className="text-sm font-semibold text-slate-500 dark:text-slate-400 hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors"
                         >
                             {isLogin ? "Don't have an account? Sign Up" : "Already have an account? Sign In"}
                         </button>
@@ -135,7 +135,7 @@ export default function LoginPage() {
 
                 {/* Back Link */}
                 <div className="mt-8 text-center">
-                    <Link href="/" className="inline-flex items-center gap-2 text-sm font-bold text-slate-400 hover:text-slate-600 transition-colors">
+                    <Link href="/" className="inline-flex items-center gap-2 text-sm font-bold text-slate-400 dark:text-slate-500 hover:text-slate-600 dark:hover:text-slate-300 transition-colors duration-300">
                         <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
                         </svg>
