@@ -17,6 +17,7 @@ export default function Generate() {
     const [features, setFeatures] = useState("");
     const [techStack, setTechStack] = useState("");
     const [context, setContext] = useState("");
+    const [activeInfo, setActiveInfo] = useState<string | null>(null);
 
     // Auto-resize textarea refs
     const projectNameRef = useRef<HTMLTextAreaElement>(null);
@@ -218,6 +219,17 @@ export default function Generate() {
                                 {/* Project Name */}
                                 <div className="relative z-10 min-w-0 w-full mt-2">
                                     <label className="block text-xs sm:text-sm font-semibold text-slate-700 dark:text-slate-300 mb-2">Project Name</label>
+                                    <div className="absolute right-0 top-0">
+                                        <button type="button" onClick={() => setActiveInfo(activeInfo === 'projectName' ? null : 'projectName')} onMouseEnter={() => setActiveInfo('projectName')} onMouseLeave={() => setActiveInfo(null)} className="text-slate-400 hover:text-emerald-500 transition-colors p-1" title="Info">
+                                            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                                        </button>
+                                        {activeInfo === 'projectName' && (
+                                            <div className="absolute right-0 top-full mt-2 w-56 p-3 bg-slate-800 dark:bg-slate-700 text-slate-100 rounded-xl text-xs leading-relaxed shadow-xl animate-in fade-in zoom-in-95 z-[60] pointer-events-none">
+                                                The official name or working title of your software project.
+                                                <div className="absolute -top-1 right-2 w-3 h-3 bg-slate-800 dark:bg-slate-700 transform rotate-45 rounded-sm"></div>
+                                            </div>
+                                        )}
+                                    </div>
                                     <textarea
                                         ref={projectNameRef}
                                         value={projectName}
@@ -231,6 +243,17 @@ export default function Generate() {
                                 {/* Project Outline */}
                                 <div className="relative z-10 min-w-0 w-full">
                                     <label className="block text-xs sm:text-sm font-semibold text-slate-700 dark:text-slate-300 mb-2">Project Outline</label>
+                                    <div className="absolute right-0 top-0">
+                                        <button type="button" onClick={() => setActiveInfo(activeInfo === 'idea' ? null : 'idea')} onMouseEnter={() => setActiveInfo('idea')} onMouseLeave={() => setActiveInfo(null)} className="text-slate-400 hover:text-emerald-500 transition-colors p-1" title="Info">
+                                            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                                        </button>
+                                        {activeInfo === 'idea' && (
+                                            <div className="absolute right-0 top-full mt-2 w-56 p-3 bg-slate-800 dark:bg-slate-700 text-slate-100 rounded-xl text-xs leading-relaxed shadow-xl animate-in fade-in zoom-in-95 z-[60] pointer-events-none">
+                                                A high-level summary of what your software aims to do and the core problems it solves.
+                                                <div className="absolute -top-1 right-2 w-3 h-3 bg-slate-800 dark:bg-slate-700 transform rotate-45 rounded-sm"></div>
+                                            </div>
+                                        )}
+                                    </div>
                                     <textarea
                                         ref={ideaRef}
                                         value={idea}
@@ -243,8 +266,19 @@ export default function Generate() {
 
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8 relative z-10 min-w-0 w-full">
                                     {/* Target Audience */}
-                                    <div className="min-w-0 w-full">
+                                    <div className="relative min-w-0 w-full">
                                         <label className="block text-xs sm:text-sm font-semibold text-slate-700 dark:text-slate-300 mb-2">Target Audience</label>
+                                        <div className="absolute right-0 top-0">
+                                            <button type="button" onClick={() => setActiveInfo(activeInfo === 'audience' ? null : 'audience')} onMouseEnter={() => setActiveInfo('audience')} onMouseLeave={() => setActiveInfo(null)} className="text-slate-400 hover:text-emerald-500 transition-colors p-1" title="Info">
+                                                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                                            </button>
+                                            {activeInfo === 'audience' && (
+                                                <div className="absolute right-0 top-full mt-2 w-56 p-3 bg-slate-800 dark:bg-slate-700 text-slate-100 rounded-xl text-xs leading-relaxed shadow-xl animate-in fade-in zoom-in-95 z-[60] pointer-events-none">
+                                                    Who will be using this software? E.g., students, internal employees, or general consumers.
+                                                    <div className="absolute -top-1 right-2 w-3 h-3 bg-slate-800 dark:bg-slate-700 transform rotate-45 rounded-sm"></div>
+                                                </div>
+                                            )}
+                                        </div>
                                         <textarea
                                             ref={targetAudienceRef}
                                             value={targetAudience}
@@ -255,8 +289,19 @@ export default function Generate() {
                                         ></textarea>
                                     </div>
                                     {/* Key Features */}
-                                    <div className="min-w-0 w-full">
+                                    <div className="relative min-w-0 w-full">
                                         <label className="block text-xs sm:text-sm font-semibold text-slate-700 dark:text-slate-300 mb-2">Key Highlights</label>
+                                        <div className="absolute right-0 top-0">
+                                            <button type="button" onClick={() => setActiveInfo(activeInfo === 'features' ? null : 'features')} onMouseEnter={() => setActiveInfo('features')} onMouseLeave={() => setActiveInfo(null)} className="text-slate-400 hover:text-emerald-500 transition-colors p-1" title="Info">
+                                                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                                            </button>
+                                            {activeInfo === 'features' && (
+                                                <div className="absolute right-0 top-full mt-2 w-56 p-3 bg-slate-800 dark:bg-slate-700 text-slate-100 rounded-xl text-xs leading-relaxed shadow-xl animate-in fade-in zoom-in-95 z-[60] pointer-events-none">
+                                                    The most important features, modules, or unique selling points of your application.
+                                                    <div className="absolute -top-1 right-2 w-3 h-3 bg-slate-800 dark:bg-slate-700 transform rotate-45 rounded-sm"></div>
+                                                </div>
+                                            )}
+                                        </div>
                                         <textarea
                                             ref={featuresRef}
                                             value={features}
@@ -271,6 +316,17 @@ export default function Generate() {
                                 {/* Tech Stack */}
                                 <div className="relative z-10 min-w-0 w-full">
                                     <label className="block text-xs sm:text-sm font-semibold text-slate-700 dark:text-slate-300 mb-2">Tech Stack</label>
+                                    <div className="absolute right-0 top-0">
+                                        <button type="button" onClick={() => setActiveInfo(activeInfo === 'techStack' ? null : 'techStack')} onMouseEnter={() => setActiveInfo('techStack')} onMouseLeave={() => setActiveInfo(null)} className="text-slate-400 hover:text-emerald-500 transition-colors p-1" title="Info">
+                                            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                                        </button>
+                                        {activeInfo === 'techStack' && (
+                                            <div className="absolute right-0 top-full mt-2 w-56 p-3 bg-slate-800 dark:bg-slate-700 text-slate-100 rounded-xl text-xs leading-relaxed shadow-xl animate-in fade-in zoom-in-95 z-[60] pointer-events-none">
+                                                Specific programming languages, frameworks, databases, and tools you plan to use.
+                                                <div className="absolute -top-1 right-2 w-3 h-3 bg-slate-800 dark:bg-slate-700 transform rotate-45 rounded-sm"></div>
+                                            </div>
+                                        )}
+                                    </div>
                                     <textarea
                                         ref={techStackRef}
                                         value={techStack}
@@ -286,6 +342,17 @@ export default function Generate() {
                                     <label className="flex items-center gap-2 text-xs sm:text-sm font-semibold text-slate-700 dark:text-slate-300 mb-2 truncate">
                                         Additional Context <span className="text-[10px] uppercase font-bold text-slate-400 dark:text-slate-500 bg-slate-100 dark:bg-slate-800 px-2 py-0.5 rounded-md hidden sm:inline-block">Optional</span>
                                     </label>
+                                    <div className="absolute right-0 top-0">
+                                        <button type="button" onClick={() => setActiveInfo(activeInfo === 'context' ? null : 'context')} onMouseEnter={() => setActiveInfo('context')} onMouseLeave={() => setActiveInfo(null)} className="text-slate-400 hover:text-emerald-500 transition-colors p-1" title="Info">
+                                            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                                        </button>
+                                        {activeInfo === 'context' && (
+                                            <div className="absolute right-0 top-full mt-2 w-56 p-3 bg-slate-800 dark:bg-slate-700 text-slate-100 rounded-xl text-xs leading-relaxed shadow-xl animate-in fade-in zoom-in-95 z-[60] pointer-events-none">
+                                                Any other constraints, security guidelines, design preferences, or business rules the AI should know.
+                                                <div className="absolute -top-1 right-2 w-3 h-3 bg-slate-800 dark:bg-slate-700 transform rotate-45 rounded-sm"></div>
+                                            </div>
+                                        )}
+                                    </div>
                                     <textarea
                                         ref={contextRef}
                                         value={context}

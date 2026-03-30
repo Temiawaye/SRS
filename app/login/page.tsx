@@ -39,6 +39,13 @@ export default function LoginPage() {
                 router.push('/');
                 router.refresh();
             } else {
+                const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).{8,}$/;
+                if (!passwordRegex.test(password)) {
+                    setError('Password must be at least 8 characters and contain uppercase, lowercase, numbers, and symbols');
+                    setIsLoading(false);
+                    return;
+                }
+
                 if (password !== confirmPassword) {
                     setError('Passwords do not match');
                     setIsLoading(false);
@@ -152,17 +159,24 @@ export default function LoginPage() {
                                 </div>
 
                                 {!isLogin && (
-                                    <div className="space-y-2">
-                                        <label className="text-sm font-bold text-slate-700 dark:text-slate-300 ml-1 transition-colors">Confirm Password</label>
-                                        <input
-                                            type="password"
-                                            required={!isLogin}
-                                            value={confirmPassword}
-                                            onChange={(e) => setConfirmPassword(e.target.value)}
-                                            placeholder="••••••••"
-                                            className="w-full bg-slate-50 dark:bg-slate-950/50 border border-slate-200 dark:border-slate-800 rounded-xl px-4 py-3.5 text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-600 focus:ring-4 focus:ring-emerald-500/10 focus:border-emerald-500 transition-all outline-none"
-                                        />
-                                    </div>
+                                    <>
+                                        <div>
+                                            <p className="text-xs font-semibold text-slate-500 dark:text-slate-400 ml-1 transition-colors">
+                                                Password must be at least 8 characters and contain uppercase, lowercase, numbers, and symbols.
+                                            </p>
+                                        </div>
+                                        <div className="space-y-2 pt-2">
+                                            <label className="text-sm font-bold text-slate-700 dark:text-slate-300 ml-1 transition-colors">Confirm Password</label>
+                                            <input
+                                                type="password"
+                                                required={!isLogin}
+                                                value={confirmPassword}
+                                                onChange={(e) => setConfirmPassword(e.target.value)}
+                                                placeholder="••••••••"
+                                                className="w-full bg-slate-50 dark:bg-slate-950/50 border border-slate-200 dark:border-slate-800 rounded-xl px-4 py-3.5 text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-600 focus:ring-4 focus:ring-emerald-500/10 focus:border-emerald-500 transition-all outline-none"
+                                            />
+                                        </div>
+                                    </>
                                 )}
                             </>
                         )}
