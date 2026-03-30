@@ -10,7 +10,9 @@ export default function LoginPage() {
     const [email, setEmail] = useState('');
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
+    const [confirmPassword, setConfirmPassword] = useState('');
     const [isLogin, setIsLogin] = useState(true);
+    const [isForgotPassword, setIsForgotPassword] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
     const [message, setMessage] = useState<string | null>(null);
@@ -22,7 +24,13 @@ export default function LoginPage() {
         setMessage(null);
 
         try {
-            if (isLogin) {
+            if (isForgotPassword) {
+                const { error } = await supabase.auth.resetPasswordForEmail(email, {
+                    redirectTo: `${window.location.origin}/auth/callback?next=/`,
+                });
+                if (error) throw error;
+                setMessage('Check your email for the password reset link!');
+            } else if (isLogin) {
                 const { error } = await supabase.auth.signInWithPassword({
                     email,
                     password,
@@ -31,6 +39,11 @@ export default function LoginPage() {
                 router.push('/');
                 router.refresh();
             } else {
+                if (password !== confirmPassword) {
+                    setError('Passwords do not match');
+                    setIsLoading(false);
+                    return;
+                }
                 const { error } = await supabase.auth.signUp({
                     email,
                     password,
@@ -62,10 +75,10 @@ export default function LoginPage() {
                         </svg>
                     </div>
                     <h1 className="text-3xl font-bold text-slate-900 dark:text-white tracking-tight transition-colors">
-                        {isLogin ? 'Welcome Back' : 'Create Account'}
+                        {isForgotPassword ? 'Reset Password' : isLogin ? 'Welcome Back' : 'Create Account'}
                     </h1>
                     <p className="text-slate-500 dark:text-slate-400 mt-2 font-medium transition-colors">
-                        {isLogin ? 'Sign in to access your projects' : 'Start generating professional SRS documents'}
+                        {isForgotPassword ? 'Enter your email to receive a password reset link' : isLogin ? 'Sign in to access your projects' : 'Start generating professional SRS documents'}
                     </p>
                 </div>
 
@@ -87,12 +100,12 @@ export default function LoginPage() {
                             </div>
                         )}
 
-                        {!isLogin && (
+                        {!isLogin && !isForgotPassword && (
                             <div className="space-y-2">
                                 <label className="text-sm font-bold text-slate-700 dark:text-slate-300 ml-1 transition-colors">Username</label>
                                 <input
                                     type="text"
-                                    required={!isLogin}
+                                    required={!isLogin && !isForgotPassword}
                                     value={username}
                                     onChange={(e) => setUsername(e.target.value)}
                                     placeholder="johndoe"
@@ -113,17 +126,46 @@ export default function LoginPage() {
                             />
                         </div>
 
-                        <div className="space-y-2">
-                            <label className="text-sm font-bold text-slate-700 dark:text-slate-300 ml-1 transition-colors">Password</label>
-                            <input
-                                type="password"
-                                required
-                                value={password}
-                                onChange={(e) => setPassword(e.target.value)}
-                                placeholder="••••••••"
-                                className="w-full bg-slate-50 dark:bg-slate-950/50 border border-slate-200 dark:border-slate-800 rounded-xl px-4 py-3.5 text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-600 focus:ring-4 focus:ring-emerald-500/10 focus:border-emerald-500 transition-all outline-none"
-                            />
-                        </div>
+                        {!isForgotPassword && (
+                            <>
+                                <div className="space-y-2">
+                                    <div className="flex items-center justify-between">
+                                        <label className="text-sm font-bold text-slate-700 dark:text-slate-300 ml-1 transition-colors">Password</label>
+                                        {isLogin && (
+                                            <button
+                                                type="button"
+                                                onClick={() => { setIsForgotPassword(true); setError(null); setMessage(null); }}
+                                                className="text-sm font-semibold text-emerald-600 dark:text-emerald-400 hover:text-emerald-700 dark:hover:text-emerald-300 transition-colors"
+                                            >
+                                                Forgot password?
+                                            </button>
+                                        )}
+                                    </div>
+                                    <input
+                                        type="password"
+                                        required={!isForgotPassword}
+                                        value={password}
+                                        onChange={(e) => setPassword(e.target.value)}
+                                        placeholder="••••••••"
+                                        className="w-full bg-slate-50 dark:bg-slate-950/50 border border-slate-200 dark:border-slate-800 rounded-xl px-4 py-3.5 text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-600 focus:ring-4 focus:ring-emerald-500/10 focus:border-emerald-500 transition-all outline-none"
+                                    />
+                                </div>
+
+                                {!isLogin && (
+                                    <div className="space-y-2">
+                                        <label className="text-sm font-bold text-slate-700 dark:text-slate-300 ml-1 transition-colors">Confirm Password</label>
+                                        <input
+                                            type="password"
+                                            required={!isLogin}
+                                            value={confirmPassword}
+                                            onChange={(e) => setConfirmPassword(e.target.value)}
+                                            placeholder="••••••••"
+                                            className="w-full bg-slate-50 dark:bg-slate-950/50 border border-slate-200 dark:border-slate-800 rounded-xl px-4 py-3.5 text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-600 focus:ring-4 focus:ring-emerald-500/10 focus:border-emerald-500 transition-all outline-none"
+                                        />
+                                    </div>
+                                )}
+                            </>
+                        )}
 
                         <button
                             type="submit"
@@ -136,28 +178,40 @@ export default function LoginPage() {
                                     <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                                 </svg>
                             ) : (
-                                isLogin ? 'Sign In' : 'Create Account'
+                                isForgotPassword ? 'Send Reset Link' : isLogin ? 'Sign In' : 'Create Account'
                             )}
                         </button>
                     </form>
 
                     <div className="mt-8 text-center relative z-10">
-                        <button
-                            onClick={() => setIsLogin(!isLogin)}
-                            className="inline-flex items-center gap-2 text-sm font-bold text-emerald-600 dark:text-emerald-400 hover:text-emerald-700 dark:hover:text-emerald-300 transition-all hover:scale-105"
-                        >
-                            {isLogin ? (
-                                <>
-                                    <span>Don't have an account? Sign Up</span>
-                                    <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" /></svg>
-                                </>
-                            ) : (
-                                <>
-                                    <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" /></svg>
-                                    <span>Already have an account? Sign In</span>
-                                </>
-                            )}
-                        </button>
+                        {isForgotPassword ? (
+                            <button
+                                type="button"
+                                onClick={() => { setIsForgotPassword(false); setError(null); setMessage(null); }}
+                                className="inline-flex items-center gap-2 text-sm font-bold text-emerald-600 dark:text-emerald-400 hover:text-emerald-700 dark:hover:text-emerald-300 transition-all hover:scale-105"
+                            >
+                                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" /></svg>
+                                <span>Back to Login</span>
+                            </button>
+                        ) : (
+                            <button
+                                type="button"
+                                onClick={() => { setIsLogin(!isLogin); setError(null); setMessage(null); }}
+                                className="inline-flex items-center gap-2 text-sm font-bold text-emerald-600 dark:text-emerald-400 hover:text-emerald-700 dark:hover:text-emerald-300 transition-all hover:scale-105"
+                            >
+                                {isLogin ? (
+                                    <>
+                                        <span>Don't have an account? Sign Up</span>
+                                        <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" /></svg>
+                                    </>
+                                ) : (
+                                    <>
+                                        <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" /></svg>
+                                        <span>Already have an account? Sign In</span>
+                                    </>
+                                )}
+                            </button>
+                        )}
                     </div>
                 </div>
 
@@ -170,7 +224,7 @@ export default function LoginPage() {
                         Back to Home
                     </Link>
                 </div>
-            </div>
-        </div>
+            </div >
+        </div >
     );
 }
