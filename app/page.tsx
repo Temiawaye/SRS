@@ -38,7 +38,7 @@ export default function Home() {
               </h1>
 
               <p className="text-lg md:text-xl text-slate-600 dark:text-slate-400 leading-relaxed max-w-2xl mx-auto mb-10 transition-colors">
-                Generate professional SRS documents in seconds. Built-in deterministic evaluation ensures your requirements are consistent, unambiguous, and testable.
+                Generate professional <span className="font-bold text-slate-900 dark:text-white">Software Requirements Specification (SRS)</span> documents in seconds. Built-in deterministic evaluation ensures your requirements are consistent, unambiguous, and testable.
               </p>
 
               <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
@@ -99,7 +99,7 @@ export default function Home() {
                   <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>
                 </div>
                 <h3 className="text-xl font-bold text-slate-900 dark:text-white">Instant Generation</h3>
-                <p className="text-slate-600 dark:text-slate-400 leading-relaxed text-sm">Convert rough ideas into structured, professional SRS documents using Llama 3.3 in seconds.</p>
+                <p className="text-slate-600 dark:text-slate-400 leading-relaxed text-sm">Convert rough ideas into structured <span className="font-semibold text-slate-800 dark:text-slate-200">Software Requirements Specifications (SRS)</span> — the technical blueprint for your software's development.</p>
               </div>
 
               <div className="flex flex-col gap-4 p-8 rounded-3xl bg-slate-50 dark:bg-slate-900/50 hover:bg-white dark:hover:bg-slate-900 border border-transparent hover:border-slate-100 dark:hover:border-slate-800 transition-all hover:shadow-xl group">
