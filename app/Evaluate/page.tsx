@@ -17,6 +17,10 @@ function EvaluateContent() {
     const [documentData, setDocumentData] = useState<any>(null);
     const [isLoading, setIsLoading] = useState(true);
 
+    const handleExport = () => {
+        window.print();
+    };
+
     const [isExternalMode, setIsExternalMode] = useState(false);
     const [externalContent, setExternalContent] = useState('');
     const [isEvaluating, setIsEvaluating] = useState(false);
@@ -178,7 +182,7 @@ function EvaluateContent() {
             <section className="flex flex-1 flex-col md:flex-row min-w-0 pb-10 md:pb-0 relative">
 
                 {/* Mobile Menu Toggle Button Group */}
-                <div className="md:hidden px-2 sm:px-6 py-4 z-10 sticky top-[73px]">
+                <div className="md:hidden px-2 sm:px-6 py-4 z-10 sticky top-[73px] no-print print:hidden">
                     <button onClick={() => setIsSidebarOpen(true)} className="p-2 -mr-2 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-xl transition-colors shadow-sm">
                         <svg className="w-7 h-7" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
@@ -187,7 +191,9 @@ function EvaluateContent() {
                 </div>
 
                 {/* Sidebar Component */}
-                <Sidebar isOpen={isSidebarOpen} setIsOpen={setIsSidebarOpen} />
+                <div className="no-print">
+                    <Sidebar isOpen={isSidebarOpen} setIsOpen={setIsSidebarOpen} />
+                </div>
 
                 {/* Main Content */}
                 <div className="flex-1 bg-slate-50/50 dark:bg-slate-950/50 p-4 md:p-8 flex justify-center min-w-0">
@@ -196,14 +202,16 @@ function EvaluateContent() {
                         {/* Header Section */}
                         <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
                             <div className="flex items-center gap-4">
-                                <Link href="/Generate">
-                                    <button className="flex items-center justify-center w-10 h-10 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-800 transition shadow-sm text-slate-500 dark:text-slate-400">
-                                        <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M15 19l-7-7 7-7" />
-                                        </svg>
-                                    </button>
-                                </Link>
-                                <div>
+                                <div className="no-print print:hidden">
+                                    <Link href="/Generate">
+                                        <button className="flex items-center justify-center w-10 h-10 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-800 transition shadow-sm text-slate-500 dark:text-slate-400">
+                                            <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M15 19l-7-7 7-7" />
+                                            </svg>
+                                        </button>
+                                    </Link>
+                                </div>
+                                <div className="no-print print:hidden">
                                     <h1 className="text-2xl font-bold tracking-tight text-slate-900 dark:text-white capitalize">{projectTitle}</h1>
                                     <div className="flex items-center gap-3 mt-1.5">
                                         <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-bold tracking-wide uppercase bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400">
@@ -213,7 +221,10 @@ function EvaluateContent() {
                                     </div>
                                 </div>
                             </div>
-                            <button className="flex items-center gap-2 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm px-4 py-2.5 rounded-xl font-medium text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 transition text-sm">
+                            <button
+                                onClick={handleExport}
+                                className="flex items-center gap-2 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm px-4 py-2.5 rounded-xl font-medium text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 transition text-sm no-print print:hidden"
+                            >
                                 <svg className="w-4 h-4 text-slate-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
                                 </svg>
@@ -225,8 +236,8 @@ function EvaluateContent() {
                         <div className="flex flex-col lg:flex-row gap-6 items-start">
 
                             {/* Left Column: SRS Output */}
-                            <div className="w-full lg:w-1/2 flex flex-col bg-white dark:bg-slate-900 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-800 lg:sticky lg:top-24 min-h-[400px] lg:min-h-[calc(100vh-8rem)] relative overflow-hidden">
-                                <div className="flex border-b border-slate-100 dark:border-slate-800 px-4 pt-2">
+                            <div className="w-full lg:w-1/2 flex flex-col bg-white dark:bg-slate-900 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-800 lg:sticky lg:top-24 min-h-[400px] lg:min-h-[calc(100vh-8rem)] relative overflow-hidden srs-print-column">
+                                <div className="flex border-b border-slate-100 dark:border-slate-800 px-4 pt-2 no-print print:hidden">
                                     <div className="px-4 py-4 flex items-center gap-2 font-bold text-sm text-slate-800 dark:text-slate-200 border-b-2 border-emerald-500 -mb-[1px]">
                                         <svg className="w-4 h-4 text-emerald-600 dark:text-emerald-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
@@ -234,7 +245,7 @@ function EvaluateContent() {
                                         SRS Output
                                     </div>
                                 </div>
-                                <div className="p-0 flex-1 overflow-y-auto relative">
+                                <div className="p-0 flex-1 overflow-y-auto relative srs-print-scroll">
                                     {isExternalMode ? (
                                         <div className="p-6 h-full">
                                             <textarea
@@ -245,7 +256,7 @@ function EvaluateContent() {
                                             />
                                         </div>
                                     ) : (
-                                        <div className="p-0 sm:p-4 pb-24 dark:bg-slate-900/50">
+                                        <div className="p-0 sm:p-4 pb-24 dark:bg-slate-900/50 srs-print-container">
                                             <SrsDocument
                                                 content={content?.content}
                                                 title={projectTitle}
@@ -275,18 +286,19 @@ function EvaluateContent() {
                                             )}
                                         </button>
                                     ) : (
-                                        <button className="flex items-center gap-2 bg-gradient-to-r from-emerald-600 to-teal-600 text-white font-medium rounded-full px-6 py-3.5 shadow-lg shadow-emerald-500/25 hover:shadow-xl hover:shadow-emerald-500/40 hover:-translate-y-0.5 transition-all duration-300 active:scale-[0.98]">
-                                            <svg className="w-4 h-4 text-emerald-100" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
-                                            </svg>
-                                            Edit Document
-                                        </button>
+                                        // <button className="flex items-center gap-2 bg-gradient-to-r from-emerald-600 to-teal-600 text-white font-medium rounded-full px-6 py-3.5 shadow-lg shadow-emerald-500/25 hover:shadow-xl hover:shadow-emerald-500/40 hover:-translate-y-0.5 transition-all duration-300 active:scale-[0.98]">
+                                        //     <svg className="w-4 h-4 text-emerald-100" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        //         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
+                                        //     </svg>
+                                        //     Edit Document
+                                        // </button>
+                                        <div> </div>
                                     )}
                                 </div>
                             </div>
 
                             {/* Right Column: The Rest */}
-                            <div className="w-full lg:w-1/2 flex flex-col gap-6">
+                            <div className="w-full lg:w-1/2 flex flex-col gap-6 metrics-panel no-print print:hidden">
                                 {/* Score & Metrics Top Cards */}
                                 <div className="flex flex-col gap-6">
                                     {/* Overall Score Card */}
@@ -366,7 +378,7 @@ function EvaluateContent() {
                                 </div>
 
                                 {/* Bottom Tabs Section */}
-                                <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-800 mt-2 flex flex-col min-h-[400px]">
+                                <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-800 mt-2 flex flex-col min-h-[400px] tabs-panel no-print print:hidden">
                                     {/* Tabs Header */}
                                     <div className="flex flex-wrap border-b border-slate-100 dark:border-slate-800 px-4 pt-2">
                                         <button

@@ -8,7 +8,7 @@ export default function NavHeader() {
     const { user, signOut, isLoading } = useAuth();
 
     return (
-        <nav className="flex w-full justify-between items-center px-4 md:px-8 py-4 bg-white/90 dark:bg-slate-900/90 backdrop-blur-md border-b border-slate-200 dark:border-slate-800 sticky top-0 z-50 transition-all">
+        <nav className="flex w-full justify-between items-center px-4 md:px-8 py-4 bg-white/90 dark:bg-slate-900/90 backdrop-blur-md border-b border-slate-200 dark:border-slate-800 sticky top-0 z-50 transition-all no-print print:hidden">
             <div className="flex items-center gap-3">
                 <Link href="/" className="flex items-center gap-3">
                     <div className="w-8 h-8 md:w-9 md:h-9 rounded-xl bg-gradient-to-tr from-emerald-500 to-teal-600 flex items-center justify-center shadow-lg shadow-emerald-500/30">

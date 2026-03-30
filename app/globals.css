@@ -18,3 +18,101 @@ body {
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
 }
+
+@media print {
+
+  /* Hide navigation, sidebar, and non-essential UI */
+  nav,
+  aside,
+  .no-print,
+  button,
+  footer,
+  .sidebar-overlay,
+  .mobile-menu-toggle {
+    display: none !important;
+  }
+
+  /* Reset main layout for print */
+  main {
+    padding: 0 !important;
+    margin: 0 !important;
+    background: white !important;
+    display: block !important;
+    min-height: auto !important;
+  }
+
+  /* Target the SRS container specifically */
+  .srs-print-container {
+    display: block !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    position: static !important;
+    overflow: visible !important;
+    height: auto !important;
+    border: none !important;
+    box-shadow: none !important;
+    padding: 0 !important;
+    margin: 0 !important;
+  }
+
+  /* Reset SrsDocument component specifically */
+  .srs-print-container>div {
+    max-width: 100% !important;
+    border: none !important;
+    box-shadow: none !important;
+    width: 100% !important;
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+
+  /* Hide the column border and shadow in Evaluate page */
+  .srs-print-column {
+    border: none !important;
+    box-shadow: none !important;
+    background: transparent !important;
+  }
+
+
+  /* Reset scrollable content for print */
+  .srs-print-scroll {
+    overflow: visible !important;
+    height: auto !important;
+    padding: 0 !important;
+    max-height: none !important;
+    scrollbar-width: none !important;
+    /* Firefox */
+    -ms-overflow-style: none;
+    /* IE/Edge */
+  }
+
+  .srs-print-scroll::-webkit-scrollbar {
+    display: none !important;
+    /* Chrome/Safari/Webkit */
+  }
+
+
+  /* Hide metrics and other panels */
+  .metrics-panel,
+  .tabs-panel {
+    display: none !important;
+  }
+
+  /* Ensure background is white and text is dark */
+  * {
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+
+  .dark body,
+  .dark main,
+  .dark .bg-slate-900 {
+    background-color: white !important;
+    color: black !important;
+  }
+
+  .dark .text-slate-100,
+  .dark .text-white,
+  .dark .prose * {
+    color: black !important;
+  }
+}
