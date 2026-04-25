@@ -40,10 +40,14 @@ export default function Generate() {
     useEffect(() => { autoResize(techStackRef.current); }, [techStack, autoResize]);
     useEffect(() => { autoResize(contextRef.current); }, [context, autoResize]);
 
+    // Document Type
+    const [documentType, setDocumentType] = useState<'SRS' | 'PRD'>('SRS');
+
     // Generation states
     const [isGenerating, setIsGenerating] = useState(false);
     const [isGenerated, setIsGenerated] = useState(false);
     const [error, setError] = useState<string | null>(null);
+    const [isIssuesOpen, setIsIssuesOpen] = useState(false);
 
     // Generated data
     const [srsData, setSrsData] = useState<any>(null);
@@ -78,7 +82,8 @@ export default function Generate() {
                     targetAudience,
                     features,
                     techStack,
-                    context
+                    context,
+                    documentType
                 })
 
             });
@@ -191,7 +196,7 @@ export default function Generate() {
 
                 {/* Main Content */}
                 <div className="flex-1 bg-slate-50/50 dark:bg-slate-950/50 p-3 sm:p-6 md:p-10 lg:p-16 flex justify-center min-w-0">
-                    <div className="max-w-3xl w-full flex flex-col min-w-0">
+                    <div className="max-w-5xl w-full flex flex-col min-w-0">
                         <div className="mb-6 md:mb-10 text-center md:text-left mt-4 md:mt-0">
                             <h1 className="text-2xl md:text-4xl font-bold text-slate-900 dark:text-white tracking-tight">Generate New Document</h1>
                             <p className="text-slate-500 dark:text-slate-400 mt-2 md:mt-3 text-sm md:text-lg">Describe your project, and our AI agents will handle the rest.</p>
@@ -214,7 +219,32 @@ export default function Generate() {
                                     </div>
                                 )}
 
-                                {/* Document Type Removed – no longer needed */}
+                                {/* Document Type */}
+                                <div className="relative z-10 min-w-0 w-full mt-2">
+                                    <label className="block text-xs sm:text-sm font-semibold text-slate-700 dark:text-slate-300 mb-2">Document Type</label>
+                                    <div className="grid grid-cols-2 gap-3">
+                                        <button
+                                            type="button"
+                                            onClick={() => setDocumentType('SRS')}
+                                            className={`p-3 rounded-xl border text-sm font-medium transition-all text-center ${documentType === 'SRS'
+                                                ? 'bg-emerald-50 dark:bg-emerald-900/20 border-emerald-500 text-emerald-700 dark:text-emerald-400'
+                                                : 'bg-slate-50 dark:bg-slate-900 border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-400 hover:border-slate-300 dark:hover:border-slate-700'
+                                                }`}
+                                        >
+                                            Software Requirements Specification (SRS)
+                                        </button>
+                                        <button
+                                            type="button"
+                                            onClick={() => setDocumentType('PRD')}
+                                            className={`p-3 rounded-xl border text-sm font-medium transition-all text-center ${documentType === 'PRD'
+                                                ? 'bg-emerald-50 dark:bg-emerald-900/20 border-emerald-500 text-emerald-700 dark:text-emerald-400'
+                                                : 'bg-slate-50 dark:bg-slate-900 border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-400 hover:border-slate-300 dark:hover:border-slate-700'
+                                                }`}
+                                        >
+                                            Product Requirements Document (PRD)
+                                        </button>
+                                    </div>
+                                </div>
 
                                 {/* Project Name */}
                                 <div className="relative z-10 min-w-0 w-full mt-2">
@@ -259,7 +289,7 @@ export default function Generate() {
                                         value={idea}
                                         onChange={(e) => setIdea(e.target.value)}
                                         placeholder="Briefly describe what your project is about."
-                                        rows={1}
+                                        rows={4}
                                         className="w-full bg-slate-50/50 dark:bg-slate-950/50 border border-slate-200 dark:border-slate-800 rounded-xl px-4 py-3 sm:py-3.5 text-slate-700 dark:text-slate-200 text-sm md:text-base placeholder:text-slate-400 focus:ring-4 focus:ring-emerald-500/10 focus:border-emerald-500 hover:bg-slate-50 dark:hover:bg-slate-950 transition-all outline-none max-h-[400px] resize-none overflow-hidden"
                                     ></textarea>
                                 </div>
@@ -406,15 +436,15 @@ export default function Generate() {
                                 </div>
 
                                 {/* Generated Document Display */}
-                                <div className="bg-white dark:bg-slate-900 rounded-2xl md:rounded-3xl shadow-sm border border-slate-200/60 dark:border-slate-800 flex flex-col overflow-hidden min-w-0">
+                                <div className="bg-white dark:bg-slate-900 rounded-2xl md:rounded-3xl shadow-sm border border-slate-200/60 dark:border-slate-800 flex flex-col overflow-hidden min-w-0 h-full">
 
                                     {/* Tab bar */}
-                                    <div className="flex border-b border-slate-100 dark:border-slate-800 px-4 pt-2 shrink-0">
+                                    <div className="flex border-b border-slate-100 dark:border-slate-800 px-1 pt-2 shrink-0">
                                         <div className="px-4 py-4 flex items-center gap-2 font-bold text-sm text-slate-800 dark:text-slate-200 border-b-2 border-emerald-500 -mb-[1px]">
                                             <svg className="w-4 h-4 text-emerald-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                                             </svg>
-                                            SRS Output
+                                            {documentType} Output
                                         </div>
                                     </div>
 
@@ -437,8 +467,8 @@ export default function Generate() {
                                                 <SrsDocument
                                                     content={srsData?.content}
                                                     title={projectName.trim() || idea.split(' ').slice(0, 6).join(' ')}
-                                                    documentType="Software Requirements Specification (SRS)"
-                                                    targetAudience={targetAudience || 'General'}
+                                                    documentType={documentType === 'PRD' ? "Product Requirements Document (PRD)" : "Software Requirements Specification (SRS)"}
+                                                    targetAudience={documentType === 'PRD' ? 'Stakeholders' : 'Development Team'}
                                                 />
                                             </div>
                                         )}
@@ -446,38 +476,51 @@ export default function Generate() {
 
                                     {/* Issues Section */}
                                     <div className="p-6 md:p-8 bg-white dark:bg-slate-900 border-t border-slate-100 dark:border-slate-800">
-                                        <div className="flex items-center gap-2 mb-6">
-                                            <div className="bg-orange-50 dark:bg-orange-900/20 p-1.5 rounded-lg">
-                                                <svg className="w-5 h-5 text-orange-500 dark:text-orange-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
-                                                </svg>
+                                        <button
+                                            onClick={() => setIsIssuesOpen(!isIssuesOpen)}
+                                            className="w-full flex items-center justify-between gap-2 mb-6 focus:outline-none group"
+                                        >
+                                            <div className="flex items-center gap-2">
+                                                <div className="bg-orange-50 dark:bg-orange-900/20 p-1.5 rounded-lg">
+                                                    <svg className="w-5 h-5 text-orange-500 dark:text-orange-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                                                    </svg>
+                                                </div>
+                                                <h3 className="font-bold text-slate-800 dark:text-slate-200 group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors">Auto-Detected Issues by Reviewer Agent</h3>
                                             </div>
-                                            <h3 className="font-bold text-slate-800 dark:text-slate-200">Auto-Detected Issues by Reviewer Agent</h3>
-                                        </div>
+                                            <svg
+                                                className={`w-5 h-5 text-slate-400 dark:text-slate-500 transition-transform duration-300 ${isIssuesOpen ? 'rotate-180' : ''}`}
+                                                fill="none" viewBox="0 0 24 24" stroke="currentColor"
+                                            >
+                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                                            </svg>
+                                        </button>
 
-                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                            {srsData?.issues?.map((issue: any, index: number) => (
-                                                <div key={index} className="border border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-800/20 rounded-2xl p-5 hover:border-slate-200 dark:hover:border-slate-700 transition-colors shadow-sm">
-                                                    <div className="bg-orange-100 dark:bg-orange-900/40 text-orange-800 dark:text-orange-300 text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded flex w-fit mb-3">
-                                                        {issue.type || 'ISSUE'}
-                                                    </div>
-                                                    <p className="text-sm font-medium text-slate-700 dark:text-slate-300 leading-relaxed mb-4">
-                                                        {issue.text}
-                                                    </p>
-                                                    <div className="bg-white dark:bg-slate-900/40 rounded-xl p-3 border border-slate-100 dark:border-slate-800">
-                                                        <p className="text-xs text-slate-500 dark:text-slate-400 italic">
-                                                            Suggestion: {issue.suggestion}
+                                        {isIssuesOpen && (
+                                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 animate-in fade-in slide-in-from-top-2 duration-300">
+                                                {srsData?.issues?.map((issue: any, index: number) => (
+                                                    <div key={index} className="border border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-800/20 rounded-2xl p-5 hover:border-slate-200 dark:hover:border-slate-700 transition-colors shadow-sm">
+                                                        <div className="bg-orange-100 dark:bg-orange-900/40 text-orange-800 dark:text-orange-300 text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded flex w-fit mb-3">
+                                                            {issue.type || 'ISSUE'}
+                                                        </div>
+                                                        <p className="text-sm font-medium text-slate-700 dark:text-slate-300 leading-relaxed mb-4">
+                                                            {issue.text}
                                                         </p>
+                                                        <div className="bg-white dark:bg-slate-900/40 rounded-xl p-3 border border-slate-100 dark:border-slate-800">
+                                                            <p className="text-xs text-slate-500 dark:text-slate-400 italic">
+                                                                Suggestion: {issue.suggestion}
+                                                            </p>
+                                                        </div>
                                                     </div>
-                                                </div>
-                                            ))}
+                                                ))}
 
-                                            {(!srsData?.issues || srsData.issues.length === 0) && (
-                                                <div className="col-span-full border border-emerald-100 bg-emerald-50/50 rounded-2xl p-5">
-                                                    <p className="text-sm font-medium text-emerald-700">No major issues found. The requirements look solid!</p>
-                                                </div>
-                                            )}
-                                        </div>
+                                                {(!srsData?.issues || srsData.issues.length === 0) && (
+                                                    <div className="col-span-full border border-emerald-100 bg-emerald-50/50 rounded-2xl p-5">
+                                                        <p className="text-sm font-medium text-emerald-700">No major issues found. The requirements look solid!</p>
+                                                    </div>
+                                                )}
+                                            </div>
+                                        )}
 
                                         {/* Actions */}
                                         <div className="mt-8 flex justify-end gap-3 border-t border-slate-100 dark:border-slate-800 pt-6">

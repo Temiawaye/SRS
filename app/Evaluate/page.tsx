@@ -177,6 +177,10 @@ function EvaluateContent() {
 
     const issues = content?.issues || [];
 
+    const isPRD = content?.content?.toLowerCase().includes('product requirements') || content?.content?.includes('Product Vision');
+    const displayDocumentType = isPRD ? 'Product Requirements Document (PRD)' : 'Software Requirements Specification (SRS)';
+    const displayTargetAudience = isPRD ? 'Stakeholders' : 'Development Team';
+
     return (
         <main className="flex flex-col min-h-screen bg-slate-50 dark:bg-slate-950 text-slate-800 dark:text-slate-200 font-sans transition-colors duration-300">
             <section className="flex flex-1 flex-col md:flex-row min-w-0 pb-10 md:pb-0 relative">
@@ -242,7 +246,7 @@ function EvaluateContent() {
                                         <svg className="w-4 h-4 text-emerald-600 dark:text-emerald-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                                         </svg>
-                                        SRS Output
+                                        {isPRD ? 'PRD Output' : 'SRS Output'}
                                     </div>
                                 </div>
                                 <div className="p-0 flex-1 overflow-y-auto relative srs-print-scroll">
@@ -261,6 +265,8 @@ function EvaluateContent() {
                                                 content={content?.content}
                                                 title={projectTitle}
                                                 date={new Date(created_at).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}
+                                                documentType={displayDocumentType}
+                                                targetAudience={displayTargetAudience}
                                             />
                                         </div>
                                     )}
@@ -435,7 +441,7 @@ function EvaluateContent() {
                                         {activeTab === 'detailed' && (
                                             <div className="flex flex-col gap-6">
                                                 <p className="text-sm text-slate-600 dark:text-slate-400 leading-relaxed font-medium">
-                                                    The generated SRS meets the standard threshold across most key metrics based on our AI heuristics. Below is a detailed breakdown of each quality dimension.
+                                                    The generated {isPRD ? 'PRD' : 'SRS'} meets the standard threshold across most key metrics based on our AI heuristics. Below is a detailed breakdown of each quality dimension.
                                                 </p>
 
                                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-5 mb-2">

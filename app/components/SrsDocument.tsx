@@ -56,7 +56,9 @@ export default function SrsDocument({
             <div className="flex-1 px-10 md:px-16 py-8">
                 {/* Document Title Section */}
                 <div className="mb-10">
-                    <h2 className="text-[10px] font-bold tracking-[0.2em] text-slate-500 dark:text-slate-400 uppercase mb-2">SOFTWARE REQUIREMENTS SPECIFICATION</h2>
+                    <h2 className="text-[10px] font-bold tracking-[0.2em] text-slate-500 dark:text-slate-400 uppercase mb-2">
+                        {documentType.replace(/\s*\(.*\)$/g, '')}
+                    </h2>
                     <h1 className="text-3xl md:text-4xl font-black text-slate-900 dark:text-white tracking-tight capitalize leading-tight">{title}</h1>
                 </div>
 

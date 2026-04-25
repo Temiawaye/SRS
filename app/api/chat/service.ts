@@ -25,6 +25,7 @@
 
 import { runPipeline } from '@/app/lib/prompts/promptEngine';
 import { COT_SRS_PIPELINE } from '@/app/lib/prompts/cotPrompts';
+import { COT_PRD_PIPELINE } from '@/app/lib/prompts/prdPrompts';
 import { evaluateWithSelfConsistency } from '@/app/lib/prompts/selfConsistencyPrompts';
 import { injectDirectionalStimulus } from '@/app/lib/prompts/directionalStimulusPrompts';
 import { detectConflictsWithToT } from '@/app/lib/prompts/totPrompts';
@@ -84,7 +85,8 @@ export class AIAgentsService {
         targetAudience: string,
         features: string,
         techStack?: string,
-        additionalContext?: string
+        additionalContext?: string,
+        documentType: 'SRS' | 'PRD' = 'SRS'
     ): Promise<GenerateResponse> {
 
         try {
@@ -101,7 +103,8 @@ export class AIAgentsService {
             );
 
             // ── Step B: CoT Pipeline (Planner → Generator → Validator) ──────
-            const pipelineResults = await runPipeline(COT_SRS_PIPELINE, {
+            const pipelineToRun = documentType === 'PRD' ? COT_PRD_PIPELINE : COT_SRS_PIPELINE;
+            const pipelineResults = await runPipeline(pipelineToRun, {
                 idea: enrichedIdea,
                 targetAudience: targetAudience || 'General Audience',
                 features: features || 'Standard Features',
@@ -195,7 +198,7 @@ export class AIAgentsService {
             console.error('[AIAgentsService] generateSRS failed:', message);
             return {
                 content:
-                    '# Error Generating SRS\nThere was a problem communicating with the AI service. Please try again.',
+                    '# Error Generating Document\nThere was a problem communicating with the AI service. Please try again.',
                 metrics: { overall: 0, completeness: 0, consistency: 0, unambiguity: 0, traceability: 0 },
                 issues: [],
             };
