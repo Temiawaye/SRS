@@ -87,6 +87,9 @@ export const generatorStep: PipelineStep = {
 You have received a structured requirements plan from the Planner Agent.
 Your job is to convert that plan into a complete, professional SRS document in Markdown.
 
+Current Date: \${new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}
+Use this current date for any timestamps or dates requested in the document.
+
 Think step by step:
 1. Map each Planner functional area to a numbered SRS section.
 2. Specify requirements in sufficient detail to enable designers to design a system to satisfy those requirements and testers to verify requirements

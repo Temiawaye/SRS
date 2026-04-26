@@ -33,6 +33,12 @@ export default function Generate() {
         el.style.height = el.scrollHeight + "px";
     }, []);
 
+    useEffect(() => {
+        const handleOpenSidebar = () => setIsSidebarOpen(true);
+        window.addEventListener('open-sidebar', handleOpenSidebar);
+        return () => window.removeEventListener('open-sidebar', handleOpenSidebar);
+    }, []);
+
     useEffect(() => { autoResize(projectNameRef.current); }, [projectName, autoResize]);
     useEffect(() => { autoResize(ideaRef.current); }, [idea, autoResize]);
     useEffect(() => { autoResize(targetAudienceRef.current); }, [targetAudience, autoResize]);
@@ -181,15 +187,6 @@ export default function Generate() {
         <main className="flex flex-col min-h-screen bg-slate-50 dark:bg-slate-950 text-slate-800 dark:text-slate-200 font-sans transition-colors duration-300">
 
             <section className="flex flex-1 flex-col md:flex-row min-w-0 pb-10 md:pb-0 relative">
-
-                {/* Mobile Menu Toggle Button Group */}
-                <div className="md:hidden px-2 sm:px-6 py-4 z-10 sticky top-[73px]">
-                    <button onClick={() => setIsSidebarOpen(true)} className="p-2 -mr-2 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-xl transition-colors shadow-sm">
-                        <svg className="w-7 h-7" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
-                        </svg>
-                    </button>
-                </div>
 
                 {/* Sidebar Component */}
                 <Sidebar isOpen={isSidebarOpen} setIsOpen={setIsSidebarOpen} />
@@ -541,6 +538,12 @@ export default function Generate() {
                                                 </>
                                             ) : (
                                                 <>
+                                                    <button
+                                                        onClick={handleGenerate}
+                                                        disabled={isGenerating}
+                                                        className="px-5 py-2.5 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-300 font-semibold text-sm rounded-xl shadow-sm hover:bg-slate-50 dark:hover:bg-slate-800 hover:border-slate-300 dark:hover:border-slate-700 transition-colors disabled:opacity-50">
+                                                        {isGenerating ? "Regenerating..." : "Regenerate"}
+                                                    </button>
                                                     <button
                                                         onClick={() => {
                                                             setDraftContent(srsData?.content || '');

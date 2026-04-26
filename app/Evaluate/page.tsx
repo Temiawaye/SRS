@@ -18,12 +18,27 @@ function EvaluateContent() {
     const [isLoading, setIsLoading] = useState(true);
 
     const handleExport = () => {
+        const titleToSave = isExternalMode ? "External Document Evaluation" : (documentData?.projects?.title || "Untitled Project");
+        const originalTitle = document.title;
+        document.title = titleToSave;
+
         window.print();
+
+        // Restore title after print dialog closes
+        setTimeout(() => {
+            document.title = originalTitle;
+        }, 1000);
     };
 
     const [isExternalMode, setIsExternalMode] = useState(false);
     const [externalContent, setExternalContent] = useState('');
     const [isEvaluating, setIsEvaluating] = useState(false);
+
+    useEffect(() => {
+        const handleOpenSidebar = () => setIsSidebarOpen(true);
+        window.addEventListener('open-sidebar', handleOpenSidebar);
+        return () => window.removeEventListener('open-sidebar', handleOpenSidebar);
+    }, []);
 
     useEffect(() => {
         if (authLoading) return;
@@ -184,15 +199,6 @@ function EvaluateContent() {
     return (
         <main className="flex flex-col min-h-screen bg-slate-50 dark:bg-slate-950 text-slate-800 dark:text-slate-200 font-sans transition-colors duration-300">
             <section className="flex flex-1 flex-col md:flex-row min-w-0 pb-10 md:pb-0 relative">
-
-                {/* Mobile Menu Toggle Button Group */}
-                <div className="md:hidden px-2 sm:px-6 py-4 z-10 sticky top-[73px] no-print print:hidden">
-                    <button onClick={() => setIsSidebarOpen(true)} className="p-2 -mr-2 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-xl transition-colors shadow-sm">
-                        <svg className="w-7 h-7" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
-                        </svg>
-                    </button>
-                </div>
 
                 {/* Sidebar Component */}
                 <div className="no-print">

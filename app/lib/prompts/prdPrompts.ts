@@ -16,12 +16,12 @@ import type { PipelineStep, PipelineContext } from './promptEngine';
 // ─────────────────────────────────── Stage 1 ───────────────────────────────────
 
 export const prdPlannerStep: PipelineStep = {
-    agentName: 'Planner Agent',
+  agentName: 'Planner Agent',
 
-    buildMessages: (ctx: PipelineContext) => [
-        {
-            role: 'system',
-            content: `You are the Planner Agent in a multi-agent PRD generation system.
+  buildMessages: (ctx: PipelineContext) => [
+    {
+      role: 'system',
+      content: `You are the Planner Agent in a multi-agent PRD generation system.
 Your ONLY job is to analyse a product idea and produce a structured product plan.
 
 Think step by step:
@@ -47,39 +47,42 @@ You MUST respond in pure JSON matching this exact structure (no markdown wrappin
   "successMetrics": ["string"],
   "nonGoals": ["string"]
 }`,
-        },
-        {
-            role: 'user',
-            content: `Project Idea: ${ctx.idea}
+    },
+    {
+      role: 'user',
+      content: `Project Idea: ${ctx.idea}
 Target Audience: ${ctx.targetAudience || 'General Audience'}
 Key Features: ${ctx.features || 'Standard Features'}
 Tech Stack: ${ctx.techStack || 'Not specified'}
 Additional Context: ${ctx.additionalContext || 'None'}
 
 Think step by step, then produce the structured product plan.`,
-        },
-    ],
+    },
+  ],
 
-    options: { temperature: 0.4, responseFormat: 'json_object' },
+  options: { temperature: 0.4, responseFormat: 'json_object' },
 };
 
 // ─────────────────────────────────── Stage 2 ───────────────────────────────────
 
 export const prdGeneratorStep: PipelineStep = {
-    agentName: 'Generator Agent',
+  agentName: 'Generator Agent',
 
-    buildMessages: (ctx: PipelineContext) => {
-        const plannerOutput = ctx.previousOutputs.find(
-            (r) => r.agentName === 'Planner Agent'
-        );
-        const plan = plannerOutput?.rawOutput ?? '(No planner output available)';
+  buildMessages: (ctx: PipelineContext) => {
+    const plannerOutput = ctx.previousOutputs.find(
+      (r) => r.agentName === 'Planner Agent'
+    );
+    const plan = plannerOutput?.rawOutput ?? '(No planner output available)';
 
-        return [
-            {
-                role: 'system',
-                content: `You are the Generator Agent in a multi-agent PRD generation system.
+    return [
+      {
+        role: 'system',
+        content: `You are the Generator Agent in a multi-agent PRD generation system.
 You have received a structured product plan from the Planner Agent.
 Your job is to convert that plan into a complete, professional PRD document in Markdown.
+
+Current Date: \${new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}
+Use this current date for any timestamps or dates requested in the document (like the Decision Log or Changelog).
 
 Think step by step:
 1. Outline the Problem Alignment and Vision.
@@ -103,14 +106,14 @@ The PRD MUST include these sections:
 - 4. Product Features / MVP Scope
   - 4.1 Product Features
   - 4.2 MVP Scope
-- 5. Architecture Overview (diagrams)
+- 5. Architecture Overview (use Mermaid diagrams)
   - 5.1 High-level Architecture
   - 5.2 Data Model
-- 6. User Journeys & Core Workflows
+- 6. User Journeys, Stories & Core Workflows (add Mermaid diagrams for flows after the write up)
   - 6.1 First-Time Setup
   - 6.2 Routine Interaction
   - 6.3 Proactive Nudge
-  - 6.4 Detatiled Onboarding Flow
+  - 6.4 Detailed Onboarding Flow
 - 7. Future Scope & Non-Goals
   - 7.1 Future Scope
   - 7.2 Non-Goals
@@ -130,10 +133,10 @@ You MUST respond in pure JSON matching this exact structure (no markdown wrappin
 {
   "content": "The full Markdown-formatted PRD document"
 }`,
-            },
-            {
-                role: 'user',
-                content: `Original Project Input:
+      },
+      {
+        role: 'user',
+        content: `Original Project Input:
 Idea: ${ctx.idea}
 Target Audience: ${ctx.targetAudience || 'General'}
 Key Features: ${ctx.features || 'Standard Features'}
@@ -143,31 +146,31 @@ Planner Agent Output (use this as your product blueprint):
 ${plan}
 
 Think step by step, then write the full PRD document. Address the technical constraints or considerations based on the Tech Stack if provided.`,
-            },
-        ];
-    },
+      },
+    ];
+  },
 
-    options: { temperature: 0.5, responseFormat: 'json_object' },
+  options: { temperature: 0.5, responseFormat: 'json_object' },
 };
 
 // ─────────────────────────────────── Stage 3 ───────────────────────────────────
 
 export const prdValidatorStep: PipelineStep = {
-    agentName: 'Validator Agent',
+  agentName: 'Validator Agent',
 
-    buildMessages: (ctx: PipelineContext) => {
-        const generatorOutput = ctx.previousOutputs.find(
-            (r) => r.agentName === 'Generator Agent'
-        );
-        const prdContent =
-            (generatorOutput?.parsed as { content?: string })?.content ??
-            generatorOutput?.rawOutput ??
-            '(No PRD content available)';
+  buildMessages: (ctx: PipelineContext) => {
+    const generatorOutput = ctx.previousOutputs.find(
+      (r) => r.agentName === 'Generator Agent'
+    );
+    const prdContent =
+      (generatorOutput?.parsed as { content?: string })?.content ??
+      generatorOutput?.rawOutput ??
+      '(No PRD content available)';
 
-        return [
-            {
-                role: 'system',
-                content: `You are the Validator Agent in a multi-agent PRD generation system.
+    return [
+      {
+        role: 'system',
+        content: `You are the Validator Agent in a multi-agent PRD generation system.
 Your job is to review the generated PRD for quality issues and produce quality metrics.
 
 Think step by step:
@@ -195,24 +198,24 @@ You MUST respond in pure JSON matching this exact structure (no markdown wrappin
     }
   ]
 }`,
-            },
-            {
-                role: 'user',
-                content: `Please review this generated PRD and produce quality metrics and a list of issues.
+      },
+      {
+        role: 'user',
+        content: `Please review this generated PRD and produce quality metrics and a list of issues.
 
 ${prdContent}
 
 Think step by step, then return your validation results.`,
-            },
-        ];
-    },
+      },
+    ];
+  },
 
-    options: { temperature: 0.2, responseFormat: 'json_object' },
+  options: { temperature: 0.2, responseFormat: 'json_object' },
 };
 
 /** Ordered CoT pipeline: Planner → Generator → Validator */
 export const COT_PRD_PIPELINE: PipelineStep[] = [
-    prdPlannerStep,
-    prdGeneratorStep,
-    prdValidatorStep,
+  prdPlannerStep,
+  prdGeneratorStep,
+  prdValidatorStep,
 ];

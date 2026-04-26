@@ -24,7 +24,7 @@ export default function NavHeader() {
             <div className="flex items-center gap-3 md:gap-6">
                 {/* <ThemeToggle /> */}
                 {!isLoading && user ? (
-                    <div className="flex items-center gap-4">
+                    <div className="hidden md:flex items-center gap-4">
                         <div className="flex flex-col items-end">
                             <span className="text-xs md:text-sm font-semibold text-slate-800 dark:text-slate-200 truncate max-w-[120px] md:max-w-[200px]">
                                 {user.user_metadata?.username || user.user_metadata?.full_name || user.email?.split('@')[0]}
@@ -41,14 +41,25 @@ export default function NavHeader() {
                         </button>
                     </div>
                 ) : !isLoading ? (
-                    <Link href="/login">
-                        <button className="flex items-center gap-2 px-4 py-2 bg-slate-900 dark:bg-white text-white dark:text-slate-900 font-medium text-sm rounded-xl hover:bg-slate-800 dark:hover:bg-slate-100 transition-colors shadow-sm">
-                            Sign In
-                        </button>
-                    </Link>
+                    <div className="hidden md:block">
+                        <Link href="/login">
+                            <button className="flex items-center gap-2 px-4 py-2 bg-slate-900 dark:bg-white text-white dark:text-slate-900 font-medium text-sm rounded-xl hover:bg-slate-800 dark:hover:bg-slate-100 transition-colors shadow-sm">
+                                Sign In
+                            </button>
+                        </Link>
+                    </div>
                 ) : (
-                    <div className="w-24 h-8 bg-slate-100 dark:bg-slate-800 animate-pulse rounded-lg"></div>
+                    <div className="hidden md:block w-24 h-8 bg-slate-100 dark:bg-slate-800 animate-pulse rounded-lg"></div>
                 )}
+
+                <button
+                    onClick={() => window.dispatchEvent(new Event('open-sidebar'))}
+                    className="md:hidden p-2 -mr-2 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-xl transition-colors shadow-sm"
+                >
+                    <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+                    </svg>
+                </button>
             </div>
         </nav>
     );

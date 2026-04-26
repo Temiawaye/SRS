@@ -11,7 +11,7 @@ interface SidebarProps {
 }
 
 export default function Sidebar({ isOpen, setIsOpen }: SidebarProps) {
-    const { user } = useAuth();
+    const { user, signOut } = useAuth();
     const [projects, setProjects] = useState<any[]>([]);
     const [projectToDelete, setProjectToDelete] = useState<string | null>(null);
     const [isDeleting, setIsDeleting] = useState(false);
@@ -142,6 +142,40 @@ export default function Sidebar({ isOpen, setIsOpen }: SidebarProps) {
                         <p className="text-xs text-slate-500 dark:text-slate-400 font-medium">No previous prompts yet.</p>
                     </div>
                 )}
+
+                {/* Mobile User/Auth Section */}
+                <div className="md:hidden mt-auto pt-4 border-t border-slate-100 dark:border-slate-800 shrink-0">
+                    {user ? (
+                        <div className="flex items-center justify-between px-2">
+                            <div className="flex flex-col">
+                                <span className="text-sm font-semibold text-slate-800 dark:text-slate-200 truncate max-w-[180px]">
+                                    {user.user_metadata?.username || user.user_metadata?.full_name || user.email?.split('@')[0]}
+                                </span>
+                                <span className="text-[10px] text-slate-500 dark:text-slate-400 truncate max-w-[180px]">{user.email}</span>
+                            </div>
+                            <button
+                                onClick={() => {
+                                    signOut();
+                                    setIsOpen(false);
+                                }}
+                                className="p-2 text-slate-500 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-colors"
+                                title="Sign Out"
+                            >
+                                <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                                </svg>
+                            </button>
+                        </div>
+                    ) : (
+                        <div className="px-2">
+                            <Link href="/login" onClick={() => setIsOpen(false)}>
+                                <button className="w-full flex items-center justify-center gap-2 px-4 py-2 bg-slate-900 dark:bg-white text-white dark:text-slate-900 font-medium text-sm rounded-xl hover:bg-slate-800 dark:hover:bg-slate-100 transition-colors shadow-sm">
+                                    Sign In
+                                </button>
+                            </Link>
+                        </div>
+                    )}
+                </div>
             </div>
 
             {/* Custom Delete Confirmation Modal */}
