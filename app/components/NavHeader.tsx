@@ -54,7 +54,7 @@ export default function NavHeader() {
                     <div className="hidden md:block w-24 h-8 bg-slate-100 dark:bg-slate-800 animate-pulse rounded-lg"></div>
                 )}
 
-                {pathname !== "/" && (
+                {pathname !== "/login" && pathname !== "/" && pathname !== "/register" && (
                     <button
                         onClick={() => window.dispatchEvent(new Event('open-sidebar'))}
                         className="md:hidden p-2 -mr-2 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-xl transition-colors shadow-sm"

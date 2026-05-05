@@ -1,6 +1,6 @@
 "use client";
 
-import React, { createContext, useContext, useState, useEffect } from "react";
+import React, { createContext, useContext, useState } from "react";
 import FeedbackModal from "./FeedbackModal";
 
 interface FeedbackContextType {
@@ -17,7 +17,7 @@ export function FeedbackProvider({ children }: { children: React.ReactNode }) {
     const [isOpen, setIsOpen] = useState(false);
     const [modalConfig, setModalConfig] = useState({ title: "", message: "" });
 
-    // Called from Generate/Evaluate pages after a feature is used
+    // Called from Generate/Evaluate pages after the generate button is used
     const triggerFeedback = (title?: string, message?: string) => {
         let featureCount = parseInt(localStorage.getItem("feature_use_count") || "0");
         featureCount += 1;
@@ -31,37 +31,6 @@ export function FeedbackProvider({ children }: { children: React.ReactNode }) {
             setTimeout(() => setIsOpen(true), 2000);
         }
     };
-
-    useEffect(() => {
-        // Track website visits (sessions separated by at least 1 hour)
-        const trackVisit = () => {
-            const lastVisit = localStorage.getItem("last_visit_timestamp");
-            const now = Date.now();
-            const ONE_HOUR = 60 * 60 * 1000;
-
-            if (!lastVisit || now - parseInt(lastVisit) > ONE_HOUR) {
-                let visitCount = parseInt(localStorage.getItem("total_visits") || "0");
-                visitCount += 1;
-                localStorage.setItem("total_visits", visitCount.toString());
-                localStorage.setItem("last_visit_timestamp", now.toString());
-
-                // Show on 1st visit, then every 5th visit
-                if (shouldShowFeedback(visitCount)) {
-                    setTimeout(() => {
-                        setModalConfig({
-                            title: visitCount === 1 ? "Welcome to SRS Studio!" : "Enjoying SRS Studio?",
-                            message: visitCount === 1
-                                ? "We'd love to know what you think on your first visit."
-                                : `You've visited us ${visitCount} times! How are we doing?`,
-                        });
-                        setIsOpen(true);
-                    }, 3000);
-                }
-            }
-        };
-
-        trackVisit();
-    }, []);
 
     return (
         <FeedbackContext.Provider value={{ triggerFeedback }}>

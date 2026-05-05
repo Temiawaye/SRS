@@ -1,6 +1,7 @@
 "use client";
 import Link from "next/link";
 import { useState, useRef, useEffect, useCallback } from "react";
+import { useRouter } from "next/navigation";
 import { useAuth } from "@/app/components/AuthProvider";
 import { supabase } from "@/app/utils/supabaseClient";
 import Sidebar from "@/app/components/Sidebar";
@@ -10,6 +11,7 @@ import { useFeedback } from "@/app/components/FeedbackProvider";
 export default function Generate() {
     const { user } = useAuth();
     const { triggerFeedback } = useFeedback();
+    const router = useRouter();
     const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
     // Form inputs
@@ -151,14 +153,6 @@ export default function Generate() {
             // 3. Display the result
             setSrsData(data);
             setIsGenerated(true);
-            
-            // Trigger feedback modal
-            setTimeout(() => {
-                triggerFeedback(
-                    "Great work!",
-                    `Your ${documentType} has been generated. How was the experience?`
-                );
-            }, 2000);
 
         } catch (err: any) {
             console.error("Generation failed:", err);
@@ -402,7 +396,7 @@ export default function Generate() {
 
                                 {/* Actions / Submit */}
                                 <div className="mt-2 md:mt-4 relative z-10 pt-6 border-t border-slate-100/80 dark:border-slate-800 flex flex-col sm:flex-row items-center justify-between gap-4 w-full">
-                                    <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400 font-medium">Takes ~30 seconds to generate via LLMs</p>
+                                    {/* <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400 font-medium">Takes ~30 seconds to generate via LLMs</p> */}
                                     <button
                                         onClick={handleGenerate}
                                         disabled={isGenerating}
@@ -562,14 +556,21 @@ export default function Generate() {
                                                         className="px-5 py-2.5 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-300 font-semibold text-sm rounded-xl shadow-sm hover:bg-slate-50 dark:hover:bg-slate-800 hover:border-slate-300 dark:hover:border-slate-700 transition-colors">
                                                         Edit Draft
                                                     </button>
-                                                    <Link href={projectId ? `/Evaluate?projectId=${projectId}` : "/Evaluate"}>
-                                                        <button className="px-5 py-2.5 bg-teal-600 text-white font-semibold text-sm rounded-xl shadow-sm shadow-teal-600/20 hover:bg-teal-700 transition-colors flex items-center gap-2">
-                                                            View Evaluation Metrics
-                                                            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M14 5l7 7m0 0l-7 7m7-7H3" />
-                                                            </svg>
-                                                        </button>
-                                                    </Link>
+                                                    <button
+                                                        onClick={() => {
+                                                            triggerFeedback(
+                                                                "How was your experience?",
+                                                                `We'd love to know what you think about your generated ${documentType}.`
+                                                            );
+                                                            router.push(projectId ? `/Evaluate?projectId=${projectId}` : "/Evaluate");
+                                                        }}
+                                                        className="px-5 py-2.5 bg-teal-600 text-white font-semibold text-sm rounded-xl shadow-sm shadow-teal-600/20 hover:bg-teal-700 transition-colors flex items-center gap-2"
+                                                    >
+                                                        View Evaluation Metrics
+                                                        <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M14 5l7 7m0 0l-7 7m7-7H3" />
+                                                        </svg>
+                                                    </button>
                                                 </>
                                             )}
                                         </div>
