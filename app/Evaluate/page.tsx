@@ -6,9 +6,11 @@ import { supabase } from '@/app/utils/supabaseClient';
 import { useAuth } from '@/app/components/AuthProvider';
 import Sidebar from '@/app/components/Sidebar';
 import SrsDocument from '@/app/components/SrsDocument';
+import { useFeedback } from '@/app/components/FeedbackProvider';
 
 function EvaluateContent() {
     const { user, isLoading: authLoading } = useAuth();
+    const { triggerFeedback } = useFeedback();
     const searchParams = useSearchParams();
     const projectId = searchParams.get('projectId');
     const [isSidebarOpen, setIsSidebarOpen] = useState(false);
@@ -33,6 +35,7 @@ function EvaluateContent() {
     const [isExternalMode, setIsExternalMode] = useState(false);
     const [externalContent, setExternalContent] = useState('');
     const [isEvaluating, setIsEvaluating] = useState(false);
+    const [showSignInModal, setShowSignInModal] = useState(false);
 
     useEffect(() => {
         const handleOpenSidebar = () => setIsSidebarOpen(true);
@@ -43,14 +46,14 @@ function EvaluateContent() {
     useEffect(() => {
         if (authLoading) return;
 
-        if (!user) {
+        if (!projectId) {
+            setIsExternalMode(true);
+            setDocumentData(null);
             setIsLoading(false);
             return;
         }
 
-        if (!projectId) {
-            setIsExternalMode(true);
-            setDocumentData(null);
+        if (!user) {
             setIsLoading(false);
             return;
         }
@@ -99,6 +102,12 @@ function EvaluateContent() {
 
     const handleEvaluateExternal = async () => {
         if (!externalContent.trim()) return;
+        
+        if (!user) {
+            setShowSignInModal(true);
+            return;
+        }
+
         setIsEvaluating(true);
         try {
             const response = await fetch('/api/chat/Evaluate', {
@@ -117,6 +126,14 @@ function EvaluateContent() {
                 content: { content: externalContent, metrics: data.metrics, issues: data.issues },
                 evaluation_metrics: []
             });
+
+            // Trigger feedback modal
+            setTimeout(() => {
+                triggerFeedback(
+                    "Evaluation Complete!",
+                    "We've analyzed your document. Was this evaluation helpful?"
+                );
+            }, 2000);
         } catch (error) {
             console.error("Evaluation error:", error);
             alert("Failed to evaluate document. Please try again.");
@@ -134,22 +151,6 @@ function EvaluateContent() {
                         <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                     </svg>
                     <p className="text-slate-500 dark:text-slate-400 font-medium">Loading Evaluation Metrics...</p>
-                </div>
-            </main>
-        );
-    }
-
-    if (!user) {
-        return (
-            <main className="min-h-screen bg-slate-50 dark:bg-slate-950 flex items-center justify-center p-4 transition-colors">
-                <div className="bg-white dark:bg-slate-900 p-8 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-800 text-center max-w-md">
-                    <h2 className="text-xl font-bold text-slate-800 dark:text-white mb-2">Sign In Required</h2>
-                    <p className="text-slate-500 dark:text-slate-400 mb-6">You must be signed in to view evaluation metrics for your documents.</p>
-                    <Link href="/login">
-                        <button className="bg-emerald-600 text-white font-medium rounded-xl px-6 py-2.5 hover:bg-emerald-700 transition-colors">
-                            Go to Sign In
-                        </button>
-                    </Link>
                 </div>
             </main>
         );
@@ -516,6 +517,34 @@ function EvaluateContent() {
                     </div>
                 </div>
             </section>
+
+            {/* Custom Sign In Modal */}
+            {showSignInModal && (
+                <div className="fixed inset-0 bg-slate-900/40 dark:bg-slate-950/60 backdrop-blur-sm z-[100] flex items-center justify-center p-4 transition-all" onClick={() => setShowSignInModal(false)}>
+                    <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-xl max-w-sm w-full p-6 text-center animate-in fade-in zoom-in-95 duration-200" onClick={e => e.stopPropagation()}>
+                        <div className="w-12 h-12 rounded-full bg-emerald-50 dark:bg-emerald-900/20 text-emerald-500 dark:text-emerald-400 flex items-center justify-center mx-auto mb-4">
+                            <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                            </svg>
+                        </div>
+                        <h3 className="text-lg font-bold text-slate-800 dark:text-white mb-2">Sign In Required</h3>
+                        <p className="text-sm text-slate-500 dark:text-slate-400 mb-6 leading-relaxed">Please sign in to evaluate documents and view detailed metrics.</p>
+                        <div className="flex gap-3 justify-center">
+                            <button
+                                onClick={() => setShowSignInModal(false)}
+                                className="px-5 py-2.5 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 font-semibold text-sm rounded-xl transition-colors min-w-[100px]"
+                            >
+                                Cancel
+                            </button>
+                            <Link href="/login" onClick={() => setShowSignInModal(false)}>
+                                <button className="px-5 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold text-sm rounded-xl transition-colors flex items-center justify-center min-w-[100px] shadow-sm shadow-emerald-600/20">
+                                    Sign In
+                                </button>
+                            </Link>
+                        </div>
+                    </div>
+                </div>
+            )}
         </main>
     );
 }

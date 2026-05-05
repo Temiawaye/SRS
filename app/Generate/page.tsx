@@ -5,9 +5,11 @@ import { useAuth } from "@/app/components/AuthProvider";
 import { supabase } from "@/app/utils/supabaseClient";
 import Sidebar from "@/app/components/Sidebar";
 import SrsDocument from "@/app/components/SrsDocument";
+import { useFeedback } from "@/app/components/FeedbackProvider";
 
 export default function Generate() {
     const { user } = useAuth();
+    const { triggerFeedback } = useFeedback();
     const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
     // Form inputs
@@ -149,6 +151,14 @@ export default function Generate() {
             // 3. Display the result
             setSrsData(data);
             setIsGenerated(true);
+            
+            // Trigger feedback modal
+            setTimeout(() => {
+                triggerFeedback(
+                    "Great work!",
+                    `Your ${documentType} has been generated. How was the experience?`
+                );
+            }, 2000);
 
         } catch (err: any) {
             console.error("Generation failed:", err);

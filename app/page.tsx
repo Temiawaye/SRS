@@ -4,10 +4,12 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { useTheme } from 'next-themes';
 import { useEffect, useState } from 'react';
+import { useAuth } from '@/app/components/AuthProvider';
 
 export default function Home() {
   const { resolvedTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
+  const { user } = useAuth();
 
   useEffect(() => {
     setMounted(true);
@@ -42,7 +44,7 @@ export default function Home() {
               </p>
 
               <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-                <Link href="/Generate">
+                <Link href={user ? "/Generate" : "/login"}>
                   <button className="w-full sm:w-auto px-8 py-4 bg-slate-900 dark:bg-white text-white dark:text-slate-900 font-bold rounded-2xl hover:bg-slate-800 dark:hover:bg-slate-100 transition-all shadow-xl shadow-slate-900/10 dark:shadow-white/5 hover:shadow-slate-900/20 hover:-translate-y-1 flex items-center justify-center gap-2 group">
                     <span>Get Started for Free</span>
                     <svg className="w-4 h-4 group-hover:translate-x-1 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">

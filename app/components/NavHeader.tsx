@@ -2,10 +2,12 @@
 
 import Link from "next/link";
 import { useAuth } from "./AuthProvider";
+import { usePathname } from "next/navigation";
 import ThemeToggle from "./ThemeToggle";
 
 export default function NavHeader() {
     const { user, signOut, isLoading } = useAuth();
+    const pathname = usePathname();
 
     return (
         <nav className="flex w-full justify-between items-center px-4 md:px-8 py-4 bg-white/90 dark:bg-slate-900/90 backdrop-blur-md border-b border-slate-200 dark:border-slate-800 sticky top-0 z-50 transition-all no-print print:hidden">
@@ -52,14 +54,16 @@ export default function NavHeader() {
                     <div className="hidden md:block w-24 h-8 bg-slate-100 dark:bg-slate-800 animate-pulse rounded-lg"></div>
                 )}
 
-                <button
-                    onClick={() => window.dispatchEvent(new Event('open-sidebar'))}
-                    className="md:hidden p-2 -mr-2 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-xl transition-colors shadow-sm"
-                >
-                    <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
-                    </svg>
-                </button>
+                {pathname !== "/" && (
+                    <button
+                        onClick={() => window.dispatchEvent(new Event('open-sidebar'))}
+                        className="md:hidden p-2 -mr-2 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-xl transition-colors shadow-sm"
+                    >
+                        <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+                        </svg>
+                    </button>
+                )}
             </div>
         </nav>
     );
