@@ -102,3 +102,41 @@ CREATE POLICY "Users can delete metrics for their own documents"
     JOIN public.projects p ON sd.project_id = p.id 
     WHERE sd.id = evaluation_metrics.srs_id AND p.user_id = auth.uid()
   ));
+
+-- 4. Create Feedbacks Table
+CREATE TABLE IF NOT EXISTS public.feedbacks (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id UUID REFERENCES auth.users(id) ON DELETE SET NULL,
+  rating INTEGER NOT NULL CHECK (rating BETWEEN 1 AND 5),
+  role TEXT CHECK (role IN ('Developer', 'Project Manager', 'Other')),
+  experience_level TEXT CHECK (experience_level IN ('< 1 year', '1-3 years', '3-5 years', '5+ years')),
+  issues BOOLEAN NOT NULL DEFAULT FALSE,
+  comment TEXT,
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+
+-- Enable RLS for Feedbacks
+ALTER TABLE public.feedbacks ENABLE ROW LEVEL SECURITY;
+
+-- Allow authenticated users to insert their own feedback
+CREATE POLICY "Users can insert feedback"
+  ON public.feedbacks FOR INSERT
+  WITH CHECK (auth.uid() = user_id OR user_id IS NULL);
+
+-- Allow authenticated users to view their own feedback
+CREATE POLICY "Users can view their own feedback"
+  ON public.feedbacks FOR SELECT
+  USING (auth.uid() = user_id);
+
+-- Migration helper (run only if feedbacks table already exists):
+-- ALTER TABLE public.feedbacks
+--   ADD COLUMN IF NOT EXISTS role TEXT
+--   CHECK (role IN ('Developer', 'Project Manager', 'Other'));
+-- ALTER TABLE public.feedbacks
+--   DROP CONSTRAINT IF EXISTS feedbacks_experience_level_check;
+-- ALTER TABLE public.feedbacks
+--   ADD CONSTRAINT feedbacks_experience_level_check
+--   CHECK (experience_level IN ('< 1 year', '1 – 3 years', '3 – 5 years', '5+ years'));
+-- ALTER TABLE public.feedbacks
+--   ADD COLUMN IF NOT EXISTS experience_level TEXT
+--   CHECK (experience_level IN ('< 1 year', '1 – 3 years', '3 – 5 years', '5+ years'));

@@ -21,6 +21,8 @@ export default function FeedbackModal({
     const [rating, setRating] = useState<number>(0);
     const [issues, setIssues] = useState(false);
     const [comment, setComment] = useState("");
+    const [role, setRole] = useState<string>("");
+    const [experienceLevel, setExperienceLevel] = useState<string>("");
     const [isSubmitted, setIsSubmitted] = useState(false);
     const [insertError, setInsertError] = useState<string | null>(null);
 
@@ -32,7 +34,7 @@ export default function FeedbackModal({
 
         const { error } = await supabase
             .from("feedbacks")
-            .insert([{ rating, issues, comment, user_id: user?.id ?? null }]);
+            .insert([{ rating, issues, comment, role, experience_level: experienceLevel, user_id: user?.id ?? null }]);
 
         if (error) {
             console.error("Failed to save feedback:", error);
@@ -48,6 +50,8 @@ export default function FeedbackModal({
             setRating(0);
             setIssues(false);
             setComment("");
+            setRole("");
+            setExperienceLevel("");
         }, 2000);
     };
 
@@ -60,7 +64,9 @@ export default function FeedbackModal({
             />
 
             {/* Modal Content */}
-            <div className="relative bg-white dark:bg-slate-900 rounded-[2.5rem] shadow-2xl border border-slate-100 dark:border-slate-800 p-8 md:p-10 w-full max-w-lg overflow-hidden animate-in zoom-in-95 slide-in-from-bottom-10 duration-300 ease-out">
+            {/* Modal Content */}
+            <div className="relative bg-white dark:bg-slate-900 rounded-[2.5rem] shadow-2xl border border-slate-100 dark:border-slate-800 w-full max-w-lg max-h-[90vh] overflow-y-auto scrollbar-hide animate-in zoom-in-95 slide-in-from-bottom-10 duration-300 ease-out">
+            <div className="p-8 md:p-10">
                 {/* Decorative Elements */}
                 <div className="absolute top-0 right-0 w-32 h-32 bg-emerald-500/5 rounded-full blur-3xl -mt-16 -mr-16 pointer-events-none"></div>
                 <div className="absolute bottom-0 left-0 w-24 h-24 bg-teal-500/5 rounded-full blur-2xl -mb-12 -ml-12 pointer-events-none"></div>
@@ -97,6 +103,48 @@ export default function FeedbackModal({
                                         </svg>
                                     </button>
                                 ))}
+                            </div>
+
+                            {/* Role */}
+                            <div className="space-y-2">
+                                <label className="text-sm font-bold text-slate-700 dark:text-slate-300 ml-1">What best describes your role?</label>
+                                <div className="flex gap-2">
+                                    {["Developer", "Project Manager", "Other"].map((r) => (
+                                        <button
+                                            key={r}
+                                            type="button"
+                                            onClick={() => setRole(r)}
+                                            className={`flex-1 py-2.5 px-2 rounded-2xl text-sm font-semibold transition-all duration-200 border ${
+                                                role === r
+                                                    ? "bg-emerald-500 text-white border-emerald-500 shadow-md shadow-emerald-500/20 scale-105"
+                                                    : "bg-slate-50 dark:bg-slate-800 text-slate-600 dark:text-slate-400 border-slate-200 dark:border-slate-700 hover:border-emerald-400 hover:text-emerald-600 dark:hover:text-emerald-400"
+                                            }`}
+                                        >
+                                            {r}
+                                        </button>
+                                    ))}
+                                </div>
+                            </div>
+
+                            {/* Experience Level — years based */}
+                            <div className="space-y-2">
+                                <label className="text-sm font-bold text-slate-700 dark:text-slate-300 ml-1">Years of Experience</label>
+                                <div className="grid grid-cols-2 gap-2">
+                                    {["< 1 year", "1-3 years", "3-5 years", "5+ years"].map((level) => (
+                                        <button
+                                            key={level}
+                                            type="button"
+                                            onClick={() => setExperienceLevel(level)}
+                                            className={`py-2.5 px-3 rounded-2xl text-sm font-semibold transition-all duration-200 border ${
+                                                experienceLevel === level
+                                                    ? "bg-emerald-500 text-white border-emerald-500 shadow-md shadow-emerald-500/20 scale-105"
+                                                    : "bg-slate-50 dark:bg-slate-800 text-slate-600 dark:text-slate-400 border-slate-200 dark:border-slate-700 hover:border-emerald-400 hover:text-emerald-600 dark:hover:text-emerald-400"
+                                            }`}
+                                        >
+                                            {level}
+                                        </button>
+                                    ))}
+                                </div>
                             </div>
 
                             <div className="flex flex-col items-start gap-3 p-4 bg-slate-50 dark:bg-slate-800/50 rounded-2xl border border-slate-100 dark:border-slate-800 transition-colors">
@@ -137,7 +185,7 @@ export default function FeedbackModal({
                                 </button>
                                 <button
                                     type="submit"
-                                    disabled={rating === 0}
+                                    disabled={rating === 0 || role === "" || experienceLevel === ""}
                                     className="flex-[2] bg-gradient-to-r from-emerald-500 to-teal-600 text-white font-bold py-4 rounded-2xl shadow-lg shadow-emerald-500/25 hover:shadow-xl hover:shadow-emerald-500/40 hover:-translate-y-0.5 active:scale-[0.98] transition-all disabled:opacity-50 disabled:hover:translate-y-0"
                                 >
                                     Send Feedback
@@ -156,6 +204,7 @@ export default function FeedbackModal({
                         <p className="text-slate-500 dark:text-slate-400 font-medium">Your feedback has been received.</p>
                     </div>
                 )}
+            </div>
             </div>
         </div>
     );
