@@ -23,7 +23,7 @@
  * for the final weighted metric calculation.
  */
 
-import { runPipeline } from '@/app/lib/prompts/promptEngine';
+import { runPipeline, EVALUATION_MODEL } from '@/app/lib/prompts/promptEngine';
 import { COT_SRS_PIPELINE } from '@/app/lib/prompts/cotPrompts';
 import { COT_PRD_PIPELINE } from '@/app/lib/prompts/prdPrompts';
 import { evaluateWithSelfConsistency } from '@/app/lib/prompts/selfConsistencyPrompts';
@@ -309,7 +309,7 @@ export class AIAgentsService {
                         'Content-Type': 'application/json',
                     },
                     body: JSON.stringify({
-                        model: 'llama-3.3-70b-versatile',
+                        model: EVALUATION_MODEL,
                         messages: [
                             {
                                 role: 'system',

@@ -49,7 +49,10 @@ export type PipelineStep = {
 // ─────────────────────────────────────────────
 
 const GROQ_API_URL = 'https://api.groq.com/openai/v1/chat/completions';
-const DEFAULT_MODEL = 'llama-3.3-70b-versatile';
+/** Model used for document generation (high-quality, large context) */
+export const DEFAULT_MODEL = 'llama-3.3-70b-versatile';
+/** Model used for evaluation passes (fast, lightweight) */
+export const EVALUATION_MODEL = 'llama-3.1-8b-instant';
 
 export async function callGroq(
     messages: GroqMessage[],

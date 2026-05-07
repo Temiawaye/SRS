@@ -20,7 +20,7 @@
  *   borderline case; one that all three flag is definitively a problem.
  */
 
-import { callGroq } from './promptEngine';
+import { callGroq, EVALUATION_MODEL } from './promptEngine';
 import type { GroqMessage } from './promptEngine';
 
 // ─────────────────────────────────────────────
@@ -239,6 +239,7 @@ export async function evaluateWithSelfConsistency(
     const passPromises = PATH_BUILDERS.map(async (path) => {
         const messages = path.build(documentContent);
         const raw = await callGroq(messages, {
+            model: EVALUATION_MODEL,
             temperature: 0.2,
             responseFormat: 'json_object',
         });
