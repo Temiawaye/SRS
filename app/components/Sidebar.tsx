@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { useAuth } from './AuthProvider';
 import { supabase } from '../utils/supabaseClient';
 import { usePathname } from 'next/navigation';
+import { useFeedback } from './FeedbackProvider';
 
 interface SidebarProps {
     isOpen: boolean;
@@ -12,6 +13,7 @@ interface SidebarProps {
 
 export default function Sidebar({ isOpen, setIsOpen }: SidebarProps) {
     const { user, signOut } = useAuth();
+    const { triggerFeedback, openFeedback } = useFeedback();
     const [projects, setProjects] = useState<any[]>([]);
     const [projectToDelete, setProjectToDelete] = useState<string | null>(null);
     const [isDeleting, setIsDeleting] = useState(false);
@@ -143,8 +145,21 @@ export default function Sidebar({ isOpen, setIsOpen }: SidebarProps) {
                     </div>
                 )}
 
+                {/* Feedback Button */}
+                <div className="mt-auto pt-4 shrink-0 px-2">
+                    <button 
+                        onClick={() => openFeedback("General Feedback", "How can we make PRD Studio better for you?")}
+                        className="w-full flex items-center gap-3 px-4 py-2.5 bg-slate-50 dark:bg-slate-800/50 text-slate-600 dark:text-slate-400 font-medium text-sm rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-white transition-colors border border-slate-200 dark:border-slate-700/50 shadow-sm"
+                    >
+                        <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" />
+                        </svg>
+                        Share Feedback
+                    </button>
+                </div>
+
                 {/* Mobile User/Auth Section */}
-                <div className="md:hidden mt-auto pt-4 border-t border-slate-100 dark:border-slate-800 shrink-0">
+                <div className="md:hidden mt-4 pt-4 border-t border-slate-100 dark:border-slate-800 shrink-0">
                     {user ? (
                         <div className="flex items-center justify-between px-2">
                             <div className="flex flex-col">

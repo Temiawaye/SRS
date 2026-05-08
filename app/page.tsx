@@ -52,7 +52,7 @@ export default function Home() {
                     </svg>
                   </button>
                 </Link>
-                <Link href="/Evaluate" className="w-full sm:w-auto">
+                <Link href={user ? "/Evaluate" : "/login"} className="w-full sm:w-auto">
                   <button className="w-full sm:w-auto px-8 py-4 bg-white dark:bg-slate-900 text-slate-700 dark:text-slate-300 font-bold rounded-2xl border border-slate-200 dark:border-slate-800 hover:border-slate-300 dark:hover:border-slate-700 transition-all hover:bg-slate-50 dark:hover:bg-slate-800 flex items-center justify-center gap-2">
                     Evaluate Existing Projects
                   </button>
@@ -239,7 +239,7 @@ export default function Home() {
                     </svg>
                   </button>
                 </Link>
-                <Link href="/Evaluate" className="w-full sm:w-auto">
+                <Link href={user ? "/Evaluate" : "/login"} className="w-full sm:w-auto">
                   <button className="px-8 py-4 bg-slate-800/50 hover:bg-slate-700/50 border border-slate-700 hover:border-slate-500 text-white font-bold rounded-2xl transition-all backdrop-blur-sm flex items-center justify-center gap-3 w-full sm:w-auto text-lg hover:-translate-y-1">
                     Try the Evaluator
                   </button>

@@ -5,6 +5,7 @@ import FeedbackModal from "./FeedbackModal";
 
 interface FeedbackContextType {
     triggerFeedback: (title?: string, message?: string) => void;
+    openFeedback: (title?: string, message?: string) => void;
 }
 
 const FeedbackContext = createContext<FeedbackContextType | undefined>(undefined);
@@ -32,8 +33,17 @@ export function FeedbackProvider({ children }: { children: React.ReactNode }) {
         }
     };
 
+    // Called directly (e.g. sidebar button) — shows immediately, no counter gate
+    const openFeedback = (title?: string, message?: string) => {
+        setModalConfig({
+            title: title || "We value your feedback!",
+            message: message || "How is your experience with SRS Studio so far?",
+        });
+        setIsOpen(true);
+    };
+
     return (
-        <FeedbackContext.Provider value={{ triggerFeedback }}>
+        <FeedbackContext.Provider value={{ triggerFeedback, openFeedback }}>
             {children}
             <FeedbackModal
                 isOpen={isOpen}

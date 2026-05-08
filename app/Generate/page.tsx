@@ -9,7 +9,7 @@ import SrsDocument from "@/app/components/SrsDocument";
 import { useFeedback } from "@/app/components/FeedbackProvider";
 
 export default function Generate() {
-    const { user } = useAuth();
+    const { user, isLoading: authLoading } = useAuth();
     const { triggerFeedback } = useFeedback();
     const router = useRouter();
     const [isSidebarOpen, setIsSidebarOpen] = useState(false);
@@ -42,6 +42,13 @@ export default function Generate() {
         window.addEventListener('open-sidebar', handleOpenSidebar);
         return () => window.removeEventListener('open-sidebar', handleOpenSidebar);
     }, []);
+
+    useEffect(() => {
+        if (authLoading) return;
+        if (!user) {
+            router.push('/login');
+        }
+    }, [user, authLoading, router]);
 
     useEffect(() => { autoResize(projectNameRef.current); }, [projectName, autoResize]);
     useEffect(() => { autoResize(ideaRef.current); }, [idea, autoResize]);
@@ -214,11 +221,7 @@ export default function Generate() {
                                     </div>
                                 )}
 
-                                {!user && (
-                                    <div className="p-3 bg-amber-50 dark:bg-amber-900/20 text-amber-700 dark:text-amber-400 border border-amber-200 dark:border-amber-800/50 rounded-xl text-sm font-medium z-10 w-full relative">
-                                        You are currently not signed in. Documents generated won't be saved to your account.
-                                    </div>
-                                )}
+
 
                                 {/* Document Type */}
                                 <div className="relative z-10 min-w-0 w-full mt-2">
