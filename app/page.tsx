@@ -137,10 +137,15 @@ export default function Home() {
                   <span className="text-[10px] font-bold uppercase tracking-wider text-teal-600 dark:text-teal-400">Strict Quality Control</span>
                 </div>
                 <h2 className="text-3xl sm:text-4xl md:text-5xl font-extrabold text-slate-900 dark:text-white mb-4 sm:mb-6 leading-tight">
-                  Deterministic Evaluation Metrics
+                  Every Requirement,{" "}
+                  <span className="bg-gradient-to-r from-teal-500 via-emerald-500 to-cyan-500 bg-clip-text text-transparent">
+                    Objectively Scored
+                  </span>
                 </h2>
                 <p className="text-base sm:text-lg text-slate-600 dark:text-slate-400 mb-8 leading-relaxed">
-                  Unlike standard AI tools that produce generic text, PRD Studio enforces rigorous engineering standards. We evaluate every single requirement against four objective metrics to guarantee development-ready specifications.
+                  No guesswork. No subjective reviews. PRD Studio evaluates every single requirement against{" "}
+                  <span className="font-semibold text-slate-800 dark:text-slate-200">four deterministic metrics</span>{" "}
+                  — catching ambiguity, ensuring atomicity, verifying completeness, and validating consistency — so your specs are development-ready from day one.
                 </p>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
@@ -174,7 +179,7 @@ export default function Home() {
                   </div>
                 </div>
               </div>
-              <div className="w-full lg:w-1/2 relative mt-4 lg:mt-0">
+              <div className="w-full lg:w-1/2 relative mt-4 lg:mt-15">
                 <div className="absolute inset-0 bg-gradient-to-r from-teal-500/20 to-emerald-500/20 blur-[80px] -z-10 rounded-full"></div>
                 <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-6 sm:p-8 shadow-2xl relative overflow-hidden">
                    {/* Abstract visualization of the metrics */}
@@ -249,7 +254,7 @@ export default function Home() {
         </section>
       </main>
 
-      <footer className="py-12 border-t border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950 transition-colors">
+      <footer className="py-8 border-t border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950 transition-colors">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col md:flex-row justify-between items-center gap-6">
           <p className="text-slate-500 text-sm font-medium">© 2026 PRD Studio. All rights reserved.</p>
           <div className="flex items-center gap-8">
