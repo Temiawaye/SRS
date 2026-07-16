@@ -7,6 +7,8 @@ import { useAuth } from '@/app/components/AuthProvider';
 import Sidebar from '@/app/components/Sidebar';
 import SrsDocument from '@/app/components/SrsDocument';
 import { useFeedback } from '@/app/components/FeedbackProvider';
+import mammoth from 'mammoth';
+import * as pdfjsLib from 'pdfjs-dist';
 
 function EvaluateContent() {
     const { user, isLoading: authLoading } = useAuth();
@@ -40,23 +42,72 @@ function EvaluateContent() {
     const [isDragging, setIsDragging] = useState(false);
     const [showPasteFallback, setShowPasteFallback] = useState(false);
     const [importedFileName, setImportedFileName] = useState<string | null>(null);
+    const [isParsingDocx, setIsParsingDocx] = useState(false);
+    const [isParsingPdf, setIsParsingPdf] = useState(false);
     const fileInputRef = useRef<HTMLInputElement>(null);
 
-    const handleFileImport = useCallback((file: File) => {
-        const allowed = ['text/plain', 'text/markdown', 'text/x-markdown'];
-        const byExt = file.name.endsWith('.md') || file.name.endsWith('.txt') || file.name.endsWith('.markdown');
-        if (!allowed.includes(file.type) && !byExt) {
-            alert('Unsupported file type. Please upload a .txt or .md file.');
+    const handleFileImport = useCallback(async (file: File) => {
+        const isDocx = file.name.endsWith('.docx') ||
+            file.type === 'application/vnd.openxmlformats-officedocument.wordprocessingml.document';
+        const isPdf = file.name.endsWith('.pdf') || file.type === 'application/pdf';
+        const isText = file.name.endsWith('.md') || file.name.endsWith('.txt') ||
+            file.name.endsWith('.markdown') ||
+            ['text/plain', 'text/markdown', 'text/x-markdown'].includes(file.type);
+
+        if (!isDocx && !isText && !isPdf) {
+            alert('Unsupported file type. Please upload a .docx, .pdf, .txt, or .md file.');
             return;
         }
-        const reader = new FileReader();
-        reader.onload = (e) => {
-            const text = e.target?.result as string;
-            setExternalContent(text);
-            setImportedFileName(file.name);
-            setShowPasteFallback(false);
-        };
-        reader.readAsText(file);
+
+        setImportedFileName(file.name);
+        setShowPasteFallback(false);
+
+        if (isDocx) {
+            setIsParsingDocx(true);
+            try {
+                const arrayBuffer = await file.arrayBuffer();
+                const result = await mammoth.extractRawText({ arrayBuffer });
+                setExternalContent(result.value);
+            } catch (err) {
+                console.error('Failed to parse .docx:', err);
+                alert('Could not read the Word document. Please try saving it as .txt or .md instead.');
+                setImportedFileName(null);
+            } finally {
+                setIsParsingDocx(false);
+            }
+        } else if (isPdf) {
+            setIsParsingPdf(true);
+            try {
+                pdfjsLib.GlobalWorkerOptions.workerSrc = `https://cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjsLib.version}/pdf.worker.min.mjs`;
+                const arrayBuffer = await file.arrayBuffer();
+                const loadingTask = pdfjsLib.getDocument({ data: arrayBuffer });
+                const pdf = await loadingTask.promise;
+                
+                let extractedText = '';
+                for (let i = 1; i <= pdf.numPages; i++) {
+                    const page = await pdf.getPage(i);
+                    const textContent = await page.getTextContent();
+                    const pageText = textContent.items
+                        .map((item: any) => item.str || '')
+                        .join(' ');
+                    extractedText += pageText + '\n\n';
+                }
+                
+                setExternalContent(extractedText.trim());
+            } catch (err) {
+                console.error('Failed to parse .pdf:', err);
+                alert('Could not read the PDF file. Please try copy-pasting or saving as text/Word format instead.');
+                setImportedFileName(null);
+            } finally {
+                setIsParsingPdf(false);
+            }
+        } else {
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                setExternalContent(e.target?.result as string);
+            };
+            reader.readAsText(file);
+        }
     }, []);
 
     useEffect(() => {
@@ -253,15 +304,17 @@ function EvaluateContent() {
                                     </div>
                                 </div>
                             </div>
-                            <button
-                                onClick={handleExport}
-                                className="flex items-center gap-2 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm px-4 py-2.5 rounded-xl font-medium text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 transition text-sm no-print print:hidden"
-                            >
-                                <svg className="w-4 h-4 text-slate-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
-                                </svg>
-                                Export PDF
-                            </button>
+                            {!isExternalMode && (
+                                <button
+                                    onClick={handleExport}
+                                    className="flex items-center gap-2 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm px-4 py-2.5 rounded-xl font-medium text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 transition text-sm no-print print:hidden"
+                                >
+                                    <svg className="w-4 h-4 text-slate-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                                    </svg>
+                                    Export PDF
+                                </button>
+                            )}
                         </div>
 
                         {/* Main Content Split: Left (SRS Output), Right (Metrics + Tabs) */}
@@ -285,7 +338,7 @@ function EvaluateContent() {
                                             <input
                                                 ref={fileInputRef}
                                                 type="file"
-                                                accept=".txt,.md,.markdown,text/plain,text/markdown"
+                                                accept=".txt,.md,.markdown,.docx,.pdf,text/plain,text/markdown,application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/pdf"
                                                 className="hidden"
                                                 onChange={(e) => {
                                                     const file = e.target.files?.[0];
@@ -324,9 +377,17 @@ function EvaluateContent() {
                                                     </p>
                                                     <p className="text-sm text-slate-400 dark:text-slate-500 mb-4">Drag & drop or click to browse</p>
                                                     <div className="flex items-center gap-2 text-[11px] font-bold uppercase tracking-widest text-slate-400 dark:text-slate-500">
+                                                        <span className="px-2 py-0.5 bg-slate-100 dark:bg-slate-800 rounded">.PDF</span>
+                                                        <span className="px-2 py-0.5 bg-slate-100 dark:bg-slate-800 rounded">.DOCX</span>
                                                         <span className="px-2 py-0.5 bg-slate-100 dark:bg-slate-800 rounded">.TXT</span>
                                                         <span className="px-2 py-0.5 bg-slate-100 dark:bg-slate-800 rounded">.MD</span>
                                                     </div>
+                                                    {(isParsingDocx || isParsingPdf) && (
+                                                        <div className="mt-4 flex items-center gap-2 text-sm text-slate-500 dark:text-slate-400">
+                                                            <svg className="animate-spin w-4 h-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"/><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"/></svg>
+                                                            {isParsingDocx ? 'Reading Word document…' : 'Reading PDF document…'}
+                                                        </div>
+                                                    )}
                                                 </div>
                                             ) : (
                                                 /* File loaded preview */
