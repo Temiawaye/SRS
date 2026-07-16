@@ -8,7 +8,6 @@ import Sidebar from '@/app/components/Sidebar';
 import SrsDocument from '@/app/components/SrsDocument';
 import { useFeedback } from '@/app/components/FeedbackProvider';
 import mammoth from 'mammoth';
-import * as pdfjsLib from 'pdfjs-dist';
 
 function EvaluateContent() {
     const { user, isLoading: authLoading } = useAuth();
@@ -45,6 +44,17 @@ function EvaluateContent() {
     const [isParsingDocx, setIsParsingDocx] = useState(false);
     const [isParsingPdf, setIsParsingPdf] = useState(false);
     const fileInputRef = useRef<HTMLInputElement>(null);
+    const pdfjsRef = useRef<any>(null);
+
+    // Dynamically load PDF.js (legacy build) on the client only
+    useEffect(() => {
+        async function loadPdfJs() {
+            const pdfjs = await import('pdfjs-dist/legacy/build/pdf' as any);
+            pdfjs.GlobalWorkerOptions.workerSrc = `https://cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjs.version}/pdf.worker.min.mjs`;
+            pdfjsRef.current = pdfjs;
+        }
+        loadPdfJs();
+    }, []);
 
     const handleFileImport = useCallback(async (file: File) => {
         const isDocx = file.name.endsWith('.docx') ||
@@ -78,11 +88,12 @@ function EvaluateContent() {
         } else if (isPdf) {
             setIsParsingPdf(true);
             try {
-                pdfjsLib.GlobalWorkerOptions.workerSrc = `https://cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjsLib.version}/pdf.worker.min.mjs`;
+                const pdfjs = pdfjsRef.current;
+                if (!pdfjs) throw new Error('PDF.js has not loaded yet. Please try again.');
                 const arrayBuffer = await file.arrayBuffer();
-                const loadingTask = pdfjsLib.getDocument({ data: arrayBuffer });
+                const loadingTask = pdfjs.getDocument({ data: arrayBuffer });
                 const pdf = await loadingTask.promise;
-                
+
                 let extractedText = '';
                 for (let i = 1; i <= pdf.numPages; i++) {
                     const page = await pdf.getPage(i);
@@ -92,7 +103,7 @@ function EvaluateContent() {
                         .join(' ');
                     extractedText += pageText + '\n\n';
                 }
-                
+
                 setExternalContent(extractedText.trim());
             } catch (err) {
                 console.error('Failed to parse .pdf:', err);
@@ -175,7 +186,7 @@ function EvaluateContent() {
 
     const handleEvaluateExternal = async () => {
         if (!externalContent.trim()) return;
-        
+
         if (!user) {
             return;
         }
@@ -359,15 +370,13 @@ function EvaluateContent() {
                                                         if (file) handleFileImport(file);
                                                     }}
                                                     onClick={() => fileInputRef.current?.click()}
-                                                    className={`flex-1 flex flex-col items-center justify-center rounded-2xl border-2 border-dashed cursor-pointer transition-all duration-200 min-h-[320px] ${
-                                                        isDragging
+                                                    className={`flex-1 flex flex-col items-center justify-center rounded-2xl border-2 border-dashed cursor-pointer transition-all duration-200 min-h-[320px] ${isDragging
                                                             ? 'border-emerald-400 bg-emerald-50/60 dark:bg-emerald-900/10 scale-[1.01]'
                                                             : 'border-slate-200 dark:border-slate-700 bg-slate-50/60 dark:bg-slate-800/30 hover:border-slate-300 dark:hover:border-slate-600 hover:bg-slate-100/40 dark:hover:bg-slate-800/50'
-                                                    }`}
+                                                        }`}
                                                 >
-                                                    <div className={`w-16 h-16 rounded-2xl flex items-center justify-center mb-5 transition-colors ${
-                                                        isDragging ? 'bg-emerald-100 dark:bg-emerald-900/30' : 'bg-slate-100 dark:bg-slate-800'
-                                                    }`}>
+                                                    <div className={`w-16 h-16 rounded-2xl flex items-center justify-center mb-5 transition-colors ${isDragging ? 'bg-emerald-100 dark:bg-emerald-900/30' : 'bg-slate-100 dark:bg-slate-800'
+                                                        }`}>
                                                         <svg className={`w-8 h-8 transition-colors ${isDragging ? 'text-emerald-500' : 'text-slate-400 dark:text-slate-500'}`} fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 13h6m-3-3v6m5 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                                                         </svg>
@@ -384,7 +393,7 @@ function EvaluateContent() {
                                                     </div>
                                                     {(isParsingDocx || isParsingPdf) && (
                                                         <div className="mt-4 flex items-center gap-2 text-sm text-slate-500 dark:text-slate-400">
-                                                            <svg className="animate-spin w-4 h-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"/><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"/></svg>
+                                                            <svg className="animate-spin w-4 h-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" /><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" /></svg>
                                                             {isParsingDocx ? 'Reading Word document…' : 'Reading PDF document…'}
                                                         </div>
                                                     )}
@@ -427,7 +436,7 @@ function EvaluateContent() {
                                                     onClick={() => setShowPasteFallback(p => !p)}
                                                     className="text-xs text-slate-400 dark:text-slate-500 hover:text-slate-600 dark:hover:text-slate-300 transition-colors flex items-center gap-1.5"
                                                 >
-                                                    <svg className={`w-3.5 h-3.5 transition-transform ${showPasteFallback ? 'rotate-90' : ''}`} fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7"/></svg>
+                                                    <svg className={`w-3.5 h-3.5 transition-transform ${showPasteFallback ? 'rotate-90' : ''}`} fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" /></svg>
                                                     {showPasteFallback ? 'Hide' : 'Or paste text manually'}
                                                 </button>
                                                 {showPasteFallback && (
