@@ -1,7 +1,9 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Link from "next/link";
 import { supabase } from "@/app/utils/supabaseClient";
+import { useAuth } from "@/app/components/AuthProvider";
 
 interface Feedback {
     id: string;
@@ -147,11 +149,15 @@ const roleMeta: Record<string, { bg: string; text: string }> = {
 
 // ─── Page ─────────────────────────────────────────────────────────────────────
 export default function FeedbackPage() {
+    const { user, isLoading: authLoading } = useAuth();
     const [feedbacks, setFeedbacks] = useState<Feedback[]>([]);
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
 
+    const isAdmin = user && (user.email?.toLowerCase().includes("admin") || user.user_metadata?.is_admin === true);
+
     useEffect(() => {
+        if (!isAdmin) return;
         const fetchFeedbacks = async () => {
             setIsLoading(true);
             const { data, error } = await supabase
@@ -163,8 +169,9 @@ export default function FeedbackPage() {
             else setFeedbacks(data || []);
             setIsLoading(false);
         };
+
         fetchFeedbacks();
-    }, []);
+    }, [isAdmin]);
 
     const avgRating = feedbacks.length
         ? (feedbacks.reduce((s, f) => s + f.rating, 0) / feedbacks.length).toFixed(1)
@@ -180,12 +187,44 @@ export default function FeedbackPage() {
         { label: "Other", count: feedbacks.filter((f) => f.role === "Other").length, color: "#94a3b8" },
     ];
 
+    if (authLoading) {
+        return (
+            <div className="min-h-screen bg-slate-50 dark:bg-slate-950 flex items-center justify-center">
+                <div className="w-8 h-8 border-4 border-emerald-500/20 border-t-emerald-500 rounded-full animate-spin" />
+            </div>
+        );
+    }
+
+    if (!isAdmin) {
+        return (
+            <div className="min-h-screen bg-slate-50 dark:bg-slate-950 flex items-center justify-center p-4 animate-in fade-in duration-200">
+                <div className="max-w-md w-full bg-white dark:bg-slate-900 rounded-[2rem] border border-slate-100 dark:border-slate-800 p-8 text-center shadow-xl shadow-slate-100 dark:shadow-none relative overflow-hidden">
+                    <div className="absolute top-0 right-0 w-32 h-32 bg-red-500/5 rounded-full blur-3xl -mt-16 -mr-16 pointer-events-none"></div>
+                    <div className="w-16 h-16 bg-red-50 dark:bg-red-950/30 text-red-500 dark:text-red-400 flex items-center justify-center rounded-2xl mx-auto mb-6 border border-red-100 dark:border-red-900/30">
+                        <svg className="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                        </svg>
+                    </div>
+                    <h2 className="text-2xl font-bold text-slate-900 dark:text-white mb-2 tracking-tight">Access Denied</h2>
+                    <p className="text-slate-500 dark:text-slate-400 text-sm leading-relaxed mb-8">
+                        This dashboard is restricted to administrator accounts only. If you believe this is an error, please contact your administrator.
+                    </p>
+                    <Link href="/">
+                        <button className="w-full bg-slate-900 dark:bg-white text-white dark:text-slate-900 font-bold py-3.5 rounded-xl hover:bg-slate-800 dark:hover:bg-slate-100 active:scale-[0.98] transition-all shadow-sm">
+                            Return Home
+                        </button>
+                    </Link>
+                </div>
+            </div>
+        );
+    }
+
     return (
         <div className="min-h-screen bg-slate-50 dark:bg-slate-950 py-12 px-4">
             <div className="max-w-5xl mx-auto space-y-8">
 
                 {/* Header */}
-                <div className="flex items-start justify-between gap-4">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                     <div>
                         <h1 className="text-3xl font-bold text-slate-900 dark:text-white tracking-tight mb-1">
                             Feedback Dashboard
@@ -194,8 +233,18 @@ export default function FeedbackPage() {
                             All user feedback submissions from PRD Studio.
                         </p>
                     </div>
-                    <div className="shrink-0 px-4 py-2 rounded-2xl bg-emerald-50 dark:bg-emerald-900/20 text-emerald-600 dark:text-emerald-400 text-sm font-bold border border-emerald-200 dark:border-emerald-800">
-                        {feedbacks.length} total
+                    <div className="flex items-center gap-3 shrink-0">
+                        <Link href="/Feedback/Scores">
+                            <button className="flex items-center gap-2 px-4 py-2 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm rounded-xl font-medium text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 transition text-sm">
+                                <svg className="w-4 h-4 text-emerald-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                                </svg>
+                                Document Scores
+                            </button>
+                        </Link>
+                        <div className="px-4 py-2 rounded-2xl bg-emerald-50 dark:bg-emerald-900/20 text-emerald-600 dark:text-emerald-400 text-sm font-bold border border-emerald-200 dark:border-emerald-800">
+                            {feedbacks.length} total
+                        </div>
                     </div>
                 </div>
 

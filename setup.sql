@@ -15,8 +15,13 @@ CREATE TABLE IF NOT EXISTS public.projects (
 -- Enable RLS for Projects
 ALTER TABLE public.projects ENABLE ROW LEVEL SECURITY;
 
-CREATE POLICY "Users can view their own projects" 
-  ON public.projects FOR SELECT USING (auth.uid() = user_id);
+CREATE POLICY "Users and admins can view projects" 
+  ON public.projects FOR SELECT 
+  USING (
+    (auth.uid() = user_id) OR 
+    (auth.jwt() ->> 'email' LIKE '%admin%') OR 
+    ((auth.jwt() -> 'user_metadata' ->> 'is_admin')::boolean = true)
+  );
 
 CREATE POLICY "Users can insert their own projects" 
   ON public.projects FOR INSERT WITH CHECK (auth.uid() = user_id);
@@ -40,9 +45,13 @@ CREATE TABLE IF NOT EXISTS public.srs_documents (
 -- Enable RLS for SRS Documents
 ALTER TABLE public.srs_documents ENABLE ROW LEVEL SECURITY;
 
-CREATE POLICY "Users can view their own SRS documents" 
+CREATE POLICY "Users and admins can view SRS documents" 
   ON public.srs_documents FOR SELECT 
-  USING (EXISTS (SELECT 1 FROM public.projects WHERE id = srs_documents.project_id AND user_id = auth.uid()));
+  USING (
+    (EXISTS (SELECT 1 FROM public.projects WHERE id = srs_documents.project_id AND user_id = auth.uid())) OR 
+    (auth.jwt() ->> 'email' LIKE '%admin%') OR 
+    ((auth.jwt() -> 'user_metadata' ->> 'is_admin')::boolean = true)
+  );
 
 CREATE POLICY "Users can insert their own SRS documents" 
   ON public.srs_documents FOR INSERT 
@@ -71,13 +80,17 @@ CREATE TABLE IF NOT EXISTS public.evaluation_metrics (
 -- Enable RLS for Evaluation Metrics
 ALTER TABLE public.evaluation_metrics ENABLE ROW LEVEL SECURITY;
 
-CREATE POLICY "Users can view metrics for their own documents" 
+CREATE POLICY "Users and admins can view evaluation metrics" 
   ON public.evaluation_metrics FOR SELECT 
-  USING (EXISTS (
-    SELECT 1 FROM public.srs_documents sd 
-    JOIN public.projects p ON sd.project_id = p.id 
-    WHERE sd.id = evaluation_metrics.srs_id AND p.user_id = auth.uid()
-  ));
+  USING (
+    (EXISTS (
+      SELECT 1 FROM public.srs_documents sd 
+      JOIN public.projects p ON sd.project_id = p.id 
+      WHERE sd.id = evaluation_metrics.srs_id AND p.user_id = auth.uid()
+    )) OR 
+    (auth.jwt() ->> 'email' LIKE '%admin%') OR 
+    ((auth.jwt() -> 'user_metadata' ->> 'is_admin')::boolean = true)
+  );
 
 CREATE POLICY "Users can insert metrics for their own documents" 
   ON public.evaluation_metrics FOR INSERT 
@@ -123,10 +136,13 @@ CREATE POLICY "Users can insert feedback"
   ON public.feedbacks FOR INSERT
   WITH CHECK (auth.uid() = user_id OR user_id IS NULL);
 
--- Allow authenticated users to view their own feedback
-CREATE POLICY "Users can view their own feedback"
-  ON public.feedbacks FOR SELECT
-  USING (auth.uid() = user_id);
+CREATE POLICY "Users and admins can view feedbacks"
+  ON public.feedbacks FOR SELECT 
+  USING (
+    (auth.uid() = user_id) OR 
+    (auth.jwt() ->> 'email' LIKE '%admin%') OR 
+    ((auth.jwt() -> 'user_metadata' ->> 'is_admin')::boolean = true)
+  );
 
 -- Migration helper (run only if feedbacks table already exists):
 -- ALTER TABLE public.feedbacks
