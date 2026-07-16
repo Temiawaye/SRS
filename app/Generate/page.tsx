@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { useAuth } from "@/app/components/AuthProvider";
 import { supabase } from "@/app/utils/supabaseClient";
 import Sidebar from "@/app/components/Sidebar";
-import SrsDocument from "@/app/components/SrsDocument";
+import TiptapEditor from "@/app/components/TiptapEditor";
 import { useFeedback } from "@/app/components/FeedbackProvider";
 
 export default function Generate() {
@@ -443,39 +443,60 @@ export default function Generate() {
                                 <div className="bg-white dark:bg-slate-900 rounded-2xl md:rounded-3xl shadow-sm border border-slate-200/60 dark:border-slate-800 flex flex-col overflow-hidden min-w-0 h-full">
 
                                     {/* Tab bar */}
-                                    <div className="flex border-b border-slate-100 dark:border-slate-800 px-1 pt-2 shrink-0">
-                                        <div className="px-4 py-4 flex items-center gap-2 font-bold text-sm text-slate-800 dark:text-slate-200 border-b-2 border-emerald-500 -mb-[1px]">
-                                            <svg className="w-4 h-4 text-emerald-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                                            </svg>
-                                            {documentType} Output
+                                    <div className="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 px-3 pt-2 shrink-0">
+                                        <div className="flex">
+                                            {/* Preview tab */}
+                                            <button
+                                                onClick={() => setIsEditingDraft(false)}
+                                                className={`px-4 py-3.5 flex items-center gap-2 font-semibold text-sm transition-colors -mb-[1px] border-b-2 ${
+                                                    !isEditingDraft
+                                                        ? 'border-emerald-500 text-slate-800 dark:text-slate-200'
+                                                        : 'border-transparent text-slate-400 dark:text-slate-500 hover:text-slate-600 dark:hover:text-slate-300'
+                                                }`}
+                                            >
+                                                <svg className={`w-4 h-4 ${!isEditingDraft ? 'text-emerald-600' : 'text-slate-400 dark:text-slate-500'}`} fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                                                </svg>
+                                                {documentType} Output
+                                            </button>
+                                            {/* Edit tab */}
+                                            <button
+                                                onClick={() => {
+                                                    setDraftContent(srsData?.content || '');
+                                                    setIsEditingDraft(true);
+                                                }}
+                                                className={`px-4 py-3.5 flex items-center gap-2 font-semibold text-sm transition-colors -mb-[1px] border-b-2 ${
+                                                    isEditingDraft
+                                                        ? 'border-emerald-500 text-slate-800 dark:text-slate-200'
+                                                        : 'border-transparent text-slate-400 dark:text-slate-500 hover:text-slate-600 dark:hover:text-slate-300'
+                                                }`}
+                                            >
+                                                <svg className={`w-4 h-4 ${isEditingDraft ? 'text-emerald-600' : 'text-slate-400 dark:text-slate-500'}`} fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                                                </svg>
+                                                Edit Draft
+                                            </button>
                                         </div>
+                                        {/* Edit-mode badge */}
+                                        {isEditingDraft && (
+                                            <span className="text-[10px] font-bold uppercase tracking-widest text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-900/30 px-2.5 py-1 rounded-full">
+                                                Editing
+                                            </span>
+                                        )}
                                     </div>
 
-                                    {/* Scrollable document body */}
+                                    {/* Scrollable document body — Tiptap handles both view & edit */}
                                     <div className="overflow-y-auto max-h-[700px]">
-                                        {isEditingDraft ? (
-                                            <div className="p-6 h-full min-h-[500px] flex flex-col">
-                                                <div className="flex justify-between items-center mb-3">
-                                                    <span className="text-xs font-bold text-emerald-600 dark:text-emerald-400 uppercase tracking-widest bg-emerald-50 dark:bg-emerald-900/40 px-2 py-1 rounded">Edit Mode Active</span>
-                                                    <span className="text-xs text-slate-400 dark:text-slate-500">Markdown Supported</span>
-                                                </div>
-                                                <textarea
-                                                    className="w-full flex-1 p-6 text-sm leading-relaxed text-slate-700 dark:text-slate-200 bg-slate-50 dark:bg-slate-950/50 border border-slate-200 dark:border-slate-800 outline-none resize-y font-mono focus:ring-4 focus:ring-emerald-500/10 focus:border-emerald-500 min-h-[600px] shadow-inner rounded-xl"
-                                                    value={draftContent}
-                                                    onChange={(e) => setDraftContent(e.target.value)}
-                                                ></textarea>
-                                            </div>
-                                        ) : (
-                                            <div className="p-4 sm:p-6 bg-slate-50/50 dark:bg-slate-900/50">
-                                                <SrsDocument
-                                                    content={srsData?.content}
-                                                    title={projectName.trim() || idea.split(' ').slice(0, 6).join(' ')}
-                                                    documentType={documentType === 'PRD' ? "Product Requirements Document (PRD)" : "Software Requirements Specification (SRS)"}
-                                                    targetAudience={documentType === 'PRD' ? 'Stakeholders' : 'Development Team'}
-                                                />
-                                            </div>
-                                        )}
+                                        <div className="p-4 sm:p-6 bg-slate-50/50 dark:bg-slate-900/50">
+                                            <TiptapEditor
+                                                content={isEditingDraft ? draftContent : (srsData?.content ?? '')}
+                                                editable={isEditingDraft}
+                                                onChange={(md) => setDraftContent(md)}
+                                                title={projectName.trim() || idea.split(' ').slice(0, 6).join(' ')}
+                                                documentType={documentType === 'PRD' ? 'Product Requirements Document (PRD)' : 'Software Requirements Specification (SRS)'}
+                                                targetAudience={documentType === 'PRD' ? 'Stakeholders' : 'Development Team'}
+                                            />
+                                        </div>
                                     </div>
 
                                     {/* Issues Section */}
@@ -529,20 +550,12 @@ export default function Generate() {
                                         {/* Actions */}
                                         <div className="mt-8 flex justify-end gap-3 border-t border-slate-100 dark:border-slate-800 pt-6">
                                             {isEditingDraft ? (
-                                                <>
-                                                    <button
-                                                        onClick={() => setIsEditingDraft(false)}
-                                                        disabled={isSaving}
-                                                        className="px-5 py-2.5 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-300 font-semibold text-sm rounded-xl shadow-sm hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors">
-                                                        Cancel
-                                                    </button>
-                                                    <button
-                                                        onClick={handleSaveDraft}
-                                                        disabled={isSaving}
-                                                        className="px-5 py-2.5 bg-emerald-600 text-white font-semibold text-sm rounded-xl shadow-sm shadow-emerald-600/20 hover:bg-emerald-700 transition-colors flex items-center gap-2 disabled:opacity-50">
-                                                        {isSaving ? "Saving..." : "Save Changes"}
-                                                    </button>
-                                                </>
+                                                <button
+                                                    onClick={handleSaveDraft}
+                                                    disabled={isSaving}
+                                                    className="px-5 py-2.5 bg-emerald-600 text-white font-semibold text-sm rounded-xl shadow-sm shadow-emerald-600/20 hover:bg-emerald-700 transition-colors flex items-center gap-2 disabled:opacity-50">
+                                                    {isSaving ? "Saving..." : "Save Changes"}
+                                                </button>
                                             ) : (
                                                 <>
                                                     <button
@@ -550,14 +563,6 @@ export default function Generate() {
                                                         disabled={isGenerating}
                                                         className="px-5 py-2.5 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-300 font-semibold text-sm rounded-xl shadow-sm hover:bg-slate-50 dark:hover:bg-slate-800 hover:border-slate-300 dark:hover:border-slate-700 transition-colors disabled:opacity-50">
                                                         {isGenerating ? "Regenerating..." : "Regenerate"}
-                                                    </button>
-                                                    <button
-                                                        onClick={() => {
-                                                            setDraftContent(srsData?.content || '');
-                                                            setIsEditingDraft(true);
-                                                        }}
-                                                        className="px-5 py-2.5 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-300 font-semibold text-sm rounded-xl shadow-sm hover:bg-slate-50 dark:hover:bg-slate-800 hover:border-slate-300 dark:hover:border-slate-700 transition-colors">
-                                                        Edit Draft
                                                     </button>
                                                     <button
                                                         onClick={() => {
